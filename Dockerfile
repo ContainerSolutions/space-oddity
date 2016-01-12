@@ -15,4 +15,4 @@ RUN npm build
 EXPOSE 8000
 
 # Start the app
-#CMD npm start
+CMD npm start
