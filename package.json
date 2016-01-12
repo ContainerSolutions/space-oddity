@@ -1,0 +1,19 @@
+{
+  "name": "space-oddity",
+  "version": "1.0.0",
+  "description": "Drone Project",
+  "main": "main.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/ContainerSolutions/space-oddity.git"
+  },
+  "author": "",
+  "license": "Apache-2.0",
+  "bugs": {
+    "url": "https://github.com/ContainerSolutions/space-oddity/issues"
+  },
+  "homepage": "https://github.com/ContainerSolutions/space-oddity#readme"
+}
