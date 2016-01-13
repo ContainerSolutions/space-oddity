@@ -56,7 +56,7 @@ var Viz = React.createClass({
 		};
 	},
 	loadData: function() {
-		d3.csv('data/drones.csv',function(csv){
+		d3.csv('data/dronesFixed.csv',function(csv){
 			this.setState({
 				data: csv
 			});
@@ -85,20 +85,22 @@ ReactDOM.render(
 );
 
 function drawLineChart(elementParent, data) {
-	console.log('draw line chart');
 
   	nv.addGraph(function() {
     lineChart = nv.models.lineChart()
-      .margin({left: 25, right: 25})
+      .margin({left: 100, right: 100})
       .x(function(d) {return d.x})
       .y(function(d) {return d.y})
       .useInteractiveGuideline(true)
       .showYAxis(true)
-      .showXAxis(true);
+      .showXAxis(true)
+      .showLegend(true);
     lineChart.xAxis
-      .tickFormat(function (d) { return data.time[d - 1]; })
+      .tickFormat(d3.format('.1f'))
+      .axisLabel('Altitude (m)')
       .staggerLabels(false);
     lineChart.yAxis
+      .axisLabel('Temp (c)')
       .tickFormat(d3.format('.1f'));
     d3.select('#' + elementParent + ' svg')
       .datum(data)
@@ -115,31 +117,22 @@ function updateLineChart() {
 }
 
 function formatData(selection, data) {
-	// Key Values
-	var keyTime = d3.nest()
-	    .key(function(d){return d.time; });
-	var keyedData = keyTime.entries(
-	    data.map(function(d) {
-	      return d;
-	    })
-	);
+	var colors = ['#ff7f00','#984ea3','#4daf4a','#377eb8','#e41a1c'];
 
-	var dataArr = [];
-	for (var i = 0; i <= keyedData.length-1; i++) {
-		var dataElement = [];
-		var currentValues = keyedData[i].values.sort(function(a,b){ return +a.key - +b.key; });
-		for (var j = 0; j <= currentValues.length-1; j++) {
-	      dataElement.push({
-	        'x': +currentValues[j].key,
-	        'y': +currentValues[j].values[0][selection]
-	      });
-	    }	
+	var dataElement = [];
+	for (var j = 0; j <= 100; j++) {
+      dataElement.push({
+	    'x': data[j].gps_alt,
+	    'y': data[j].temp_506f
+      });
+    }	
 
-		dataArr.push({
-			key: +keyedData[i].key,
-			values: dataElement
-		});
-	}
+	dataArr.push({
+		key: 'Drone 1',
+		color: colors[0],
+		values: dataElement
+	});
+
 
 	return dataArr;
 }
