@@ -118,7 +118,7 @@ function updateLineChart() {
 
 function formatData(selection, data) {
 	var colors = ['#ff7f00','#984ea3','#4daf4a','#377eb8','#e41a1c'];
-
+	var dataArr = [];
 	var dataElement = [];
 	for (var j = 0; j <= 100; j++) {
       dataElement.push({
