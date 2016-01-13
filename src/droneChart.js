@@ -5,7 +5,7 @@ var ChartHeader = React.createClass({
 		return (
 			<div className='row text-center'>
 				<div className='col-md-12'>
-					<h3>Temp By Altitude</h3>
+					<h3>MeteoDrone Data</h3>
 				</div>
 			</div>
 		);
@@ -19,11 +19,13 @@ var DataSelect = React.createClass({
 				<div className='col-md-12'>
 					<div id='data-select-dropdown' className='dropdown'>
 						<button className='btn btn-default dropdown-toggle' type='button' id='data-select-button' data-toggle='dropdown' aria-haspopup='true' aria-expanded='true'>
-							<span id='data-text'>Avg Temp by Altitude</span> <span className='caret'></span>
+							<span id='data-text'>Temp by Altitude</span> <span className='caret'></span>
 						</button>
 						<ul onClick={this.props.handleSelect} className='dropdown-menu' aria-labelledby='data-select-button'>
-							<li><a href='javascript:void(0)' className='select current-selection' id='gps_alt'>Altitude By Time</a></li>
-							 
+							<li><a href='javascript:void(0)' className='select current-selection' id='temp_506f'>Temp by Altitude</a></li>
+							<li><a href='javascript:void(0)' className='select' id='relhum_1'>Humidity By Altitude</a></li>
+							<li><a href='javascript:void(0)' className='select' id='wind_speed'>Wind Speed By Altitude</a></li>
+							<li><a href='javascript:void(0)' className='select' id='wind_dir'>Wind Direction By Altitude</a></li>
 						</ul>
 					</div>
 				</div>
@@ -37,7 +39,7 @@ var BarChart = React.createClass({
 		drawLineChart('line-chart', formatData(this.props.selection, this.props.data));
 	},
 	componentDidUpdate: function() {
-		updateLineChart();
+		updateLineChart('line-chart', formatData(this.props.selection, this.props.data));
 	},
 	render: function() {
 		return (
@@ -52,7 +54,7 @@ var Viz = React.createClass({
 	getInitialState: function() {
 		return {
 			data: [],
-			selection: 'gps_alt'
+			selection: 'temp_506f'
 		};
 	},
 	loadData: function() {
@@ -65,8 +67,14 @@ var Viz = React.createClass({
 	componentDidMount: function() {
 		this.loadData();
 	},
-	handleDataSelect: function() {
-
+	handleDataSelect: function(e) {
+		var selection = e.target.id;
+	    $('#select-text').text(e.target.innerHTML);
+	    $('.select').removeClass('current-selection');
+	    $('#' + selection).addClass('current-selection');
+	    this.setState({
+	      selection: selection
+	    });
 	},
 	render: function() {
 		return (
@@ -88,7 +96,8 @@ function drawLineChart(elementParent, data) {
 
   	nv.addGraph(function() {
     lineChart = nv.models.lineChart()
-      .margin({left: 100, right: 100})
+      // .margin({left: 100, right: 100})
+      .margin({left: 25, right: 25})
       .x(function(d) {return d.x})
       .y(function(d) {return d.y})
       .useInteractiveGuideline(true)
@@ -111,9 +120,11 @@ function drawLineChart(elementParent, data) {
 
 }
 
-function updateLineChart() {
+function updateLineChart(elementParent, data) {
 	console.log('update line chart');
-
+	 d3.select('#' + elementParent + ' svg')
+    .datum(data)
+    .call(lineChart);
 }
 
 function formatData(selection, data) {
@@ -122,8 +133,8 @@ function formatData(selection, data) {
 	var dataElement = [];
 	for (var j = 0; j <= 100; j++) {
       dataElement.push({
-	    'x': data[j].gps_alt,
-	    'y': data[j].temp_506f
+	    'x': data[j]['gps_alt'],
+	    'y': data[j][selection]
       });
     }	
 

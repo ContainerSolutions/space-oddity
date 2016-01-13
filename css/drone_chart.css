@@ -1,0 +1,45 @@
+/* globals */
+html {
+  font-size: 100%;
+  -webkit-text-size-adjust: 100%;
+  -ms-text-size-adjust: 100%;
+  overflow-x: hidden;
+}
+body {
+  padding-right:0px !important;
+  margin-right:0px !important;
+}
+html,
+body {
+  width: 100%;
+  height: 100%;
+}
+
+#to-viz-container {
+  height: 40px;
+}
+
+/* data select */
+#data-select-dropdown {
+  margin-top: 5px;
+  margin-bottom: 23px;
+}
+.dropdown-menu {
+  left: 50%;
+  right: auto;
+  text-align: center;
+  transform: translate(-50%, 0);
+}
+.current-selection {
+  background-color: #d4d4d4;
+}
+
+/* bar chart */
+#line-chart {
+  height: 450px;
+}
+@media only screen and (max-width: 480px)  {
+  #line-chart {
+    height: 275px;
+  }
+}*/
