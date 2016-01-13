@@ -69,7 +69,7 @@ var Viz = React.createClass({
 	},
 	handleDataSelect: function(e) {
 		var selection = e.target.id;
-	    $('#select-text').text(e.target.innerHTML);
+	    $('#data-text').text(e.target.innerHTML);
 	    $('.select').removeClass('current-selection');
 	    $('#' + selection).addClass('current-selection');
 	    this.setState({
@@ -96,8 +96,7 @@ function drawLineChart(elementParent, data) {
 
   	nv.addGraph(function() {
     lineChart = nv.models.lineChart()
-      // .margin({left: 100, right: 100})
-      .margin({left: 25, right: 25})
+      .margin({left: 40, right: 25})
       .x(function(d) {return d.x})
       .y(function(d) {return d.y})
       .useInteractiveGuideline(true)
@@ -109,7 +108,6 @@ function drawLineChart(elementParent, data) {
       .axisLabel('Altitude (m)')
       .staggerLabels(false);
     lineChart.yAxis
-      .axisLabel('Temp (c)')
       .tickFormat(d3.format('.1f'));
     d3.select('#' + elementParent + ' svg')
       .datum(data)
@@ -143,7 +141,6 @@ function formatData(selection, data) {
 		color: colors[0],
 		values: dataElement
 	});
-
 
 	return dataArr;
 }

@@ -1,4 +1,4 @@
-FROM node:4-onbuild
+FROM node:argon
 
 # Prepare app directory
 RUN mkdir -p /usr/src/app
@@ -12,7 +12,8 @@ RUN npm install
 RUN npm build
 
 # Expose the app port
-EXPOSE 8000
+EXPOSE 8080
 
 # Start the app
-CMD npm start
+# CMD npm start
+CMD [ "npm", "start" ]

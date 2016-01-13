@@ -2,7 +2,10 @@
   "name": "space-oddity",
   "version": "1.0.0",
   "description": "Drone Project",
-  "main": "main.js",
+  "main": "server.js",
+  "dependencies": {
+    "express": "^4.13.3"
+  },
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },
