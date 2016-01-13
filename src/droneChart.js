@@ -19,13 +19,13 @@ var DataSelect = React.createClass({
 				<div className='col-md-12'>
 					<div id='data-select-dropdown' className='dropdown'>
 						<button className='btn btn-default dropdown-toggle' type='button' id='data-select-button' data-toggle='dropdown' aria-haspopup='true' aria-expanded='true'>
-							<span id='data-text'>Temp by Altitude</span> <span className='caret'></span>
+							<span id='data-text'>Temp(°C) by Altitude</span> <span className='caret'></span>
 						</button>
 						<ul onClick={this.props.handleSelect} className='dropdown-menu' aria-labelledby='data-select-button'>
-							<li><a href='javascript:void(0)' className='select current-selection' id='temp_506f'>Temp by Altitude</a></li>
-							<li><a href='javascript:void(0)' className='select' id='relhum_1'>Humidity By Altitude</a></li>
-							<li><a href='javascript:void(0)' className='select' id='wind_speed'>Wind Speed By Altitude</a></li>
-							<li><a href='javascript:void(0)' className='select' id='wind_dir'>Wind Direction By Altitude</a></li>
+							<li><a href='javascript:void(0)' className='select current-selection' id='temp_506f'>Temp(°C) by Altitude</a></li>
+							<li><a href='javascript:void(0)' className='select' id='relhum_1'>Humidity(%) By Altitude</a></li>
+							<li><a href='javascript:void(0)' className='select' id='wind_speed'>Wind Speed(m/s) By Altitude</a></li>
+							<li><a href='javascript:void(0)' className='select' id='wind_dir'>Wind Direction(°) By Altitude</a></li>
 						</ul>
 					</div>
 				</div>
@@ -115,25 +115,41 @@ function drawLineChart(elementParent, data) {
     nv.utils.windowResize(function() { lineChart.update() });
     return lineChart;
   });
-
 }
 
 function updateLineChart(elementParent, data) {
-	console.log('update line chart');
 	 d3.select('#' + elementParent + ' svg')
     .datum(data)
     .call(lineChart);
 }
 
 function formatData(selection, data) {
+
+	// Group by Time
+	var keyTime = d3.nest()
+    	.key(function(d){return d.time; });
+  	var keyedData = keyTime.entries(
+    data.map(function(d) {
+      		return d;
+    	})
+  	);
+
 	var colors = ['#ff7f00','#984ea3','#4daf4a','#377eb8','#e41a1c'];
 	var dataArr = [];
 	var dataElement = [];
-	for (var j = 0; j <= 100; j++) {
-      dataElement.push({
-	    'x': data[j]['gps_alt'],
-	    'y': data[j][selection]
-      });
+	// Magic number to only capture the rising data
+	for (var i = 0; i <= 430; i++) {
+		var values = keyedData[i]['values']
+		var xVal = 0.0;
+		var yVal = 0.0;
+		for (var j = 0; j < values.length; j++) {
+			xVal += Number(values[j]['gps_alt']);
+			yVal += Number(values[j][selection]);
+		}
+      	dataElement.push({
+	    	'x': xVal / values.length,
+	    	'y': yVal / values.length
+      	});
     }	
 
 	dataArr.push({
