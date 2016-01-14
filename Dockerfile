@@ -13,6 +13,7 @@ RUN npm build
 # Expose the app port
 EXPOSE 8080
 
+#Hmm, we should switch user here, shouldn't run as root...
+#
 # Start the app
-# CMD npm start
 CMD [ "npm", "start" ]
