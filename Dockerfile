@@ -1,8 +1,7 @@
 FROM node:argon
 
 # Prepare app directory
-RUN mkdir -p /usr/src/app
-ADD . /usr/src/app
+COPY . /usr/src/app
 
 # Install dependencies
 WORKDIR /usr/src/app

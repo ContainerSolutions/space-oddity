@@ -6,7 +6,7 @@
             "network": "HOST",
             "parameters": [
                 { "key": "env", 
-                  "value": "ELASTICSEARCH_URL=http://mi-worker-003:4000" }
+                  "value": "ELASTICSEARCH_URL=http://elasticsearch-executor.service.consul:4000" }
             ]
                 
         }
