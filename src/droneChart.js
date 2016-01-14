@@ -22,10 +22,11 @@ var DataSelect = React.createClass({
 							<span id='data-text'>Temp(°C) by Altitude</span> <span className='caret'></span>
 						</button>
 						<ul onClick={this.props.handleSelect} className='dropdown-menu' aria-labelledby='data-select-button'>
-							<li><a href='javascript:void(0)' className='select current-selection' id='temp_506f'>Temp(°C) by Altitude</a></li>
-							<li><a href='javascript:void(0)' className='select' id='relhum_1'>Humidity(%) By Altitude</a></li>
-							<li><a href='javascript:void(0)' className='select' id='wind_speed'>Wind Speed(m/s) By Altitude</a></li>
-							<li><a href='javascript:void(0)' className='select' id='wind_dir'>Wind Direction(°) By Altitude</a></li>
+							<li><a href='javascript:void(0)' className='select current-selection' id='temp_506f-gps_alt'>Temp(°C) by Altitude</a></li>
+							<li><a href='javascript:void(0)' className='select' id='relhum_1-gps_alt'>Humidity(%) By Altitude</a></li>
+							<li><a href='javascript:void(0)' className='select' id='wind_speed-gps_alt'>Wind Speed(m/s) By Altitude</a></li>
+							<li><a href='javascript:void(0)' className='select' id='wind_dir-gps_alt'>Wind Direction(°) By Altitude</a></li>
+							<li><a href='javascript:void(0)' className='select' id='temp_506f-time'>Temp(°C) By Time(s)</a></li>
 						</ul>
 					</div>
 				</div>
@@ -36,10 +37,10 @@ var DataSelect = React.createClass({
 
 var BarChart = React.createClass({
 	componentDidMount: function() {
-		drawLineChart('line-chart', formatData(this.props.selection, this.props.data));
+		drawLineChart('line-chart', formatData(this.props.selection, this.props.data, this.props.data2));
 	},
 	componentDidUpdate: function() {
-		updateLineChart('line-chart', formatData(this.props.selection, this.props.data));
+		updateLineChart('line-chart', formatData(this.props.selection, this.props.data, this.props.data2));
 	},
 	render: function() {
 		return (
@@ -54,13 +55,19 @@ var Viz = React.createClass({
 	getInitialState: function() {
 		return {
 			data: [],
-			selection: 'temp_506f'
+			data2: [],
+			selection: 'temp_506f-gps_alt'
 		};
 	},
 	loadData: function() {
-		d3.csv('data/dronesFixed.csv',function(csv){
+		d3.csv('data/drone1.csv',function(csv){
 			this.setState({
 				data: csv
+			});
+		}.bind(this));
+		d3.csv('data/drone2.csv',function(csv){
+			this.setState({
+				data2: csv
 			});
 		}.bind(this));
 	},
@@ -71,7 +78,9 @@ var Viz = React.createClass({
 		var selection = e.target.id;
 	    $('#data-text').text(e.target.innerHTML);
 	    $('.select').removeClass('current-selection');
+	    // TODO FIX
 	    $('#' + selection).addClass('current-selection');
+
 	    this.setState({
 	      selection: selection
 	    });
@@ -81,7 +90,7 @@ var Viz = React.createClass({
 			<div id='viz'>
 				<ChartHeader />
 				<DataSelect selection={this.state.selection} handleSelect={this.handleDataSelect} />
-				{ this.state.data.length != 0 ? <BarChart data={this.state.data} selection={this.state.selection} /> : null }
+				{ this.state.data.length != 0 ? <BarChart data={this.state.data} data2={this.state.data2} selection={this.state.selection} /> : null }
 			</div>
 		);
 	}
@@ -105,7 +114,7 @@ function drawLineChart(elementParent, data) {
       .showLegend(true);
     lineChart.xAxis
       .tickFormat(d3.format('.1f'))
-      .axisLabel('Altitude (m)')
+      // .axisLabel('Altitude (m)')
       .staggerLabels(false);
     lineChart.yAxis
       .tickFormat(d3.format('.1f'));
@@ -123,40 +132,65 @@ function updateLineChart(elementParent, data) {
     .call(lineChart);
 }
 
-function formatData(selection, data) {
-
-	// Group by Time
-	var keyTime = d3.nest()
-    	.key(function(d){return d.time; });
-  	var keyedData = keyTime.entries(
-    data.map(function(d) {
-      		return d;
-    	})
-  	);
+function formatData(selection, args) {
 
 	var colors = ['#ff7f00','#984ea3','#4daf4a','#377eb8','#e41a1c'];
 	var dataArr = [];
-	var dataElement = [];
-	// Magic number to only capture the rising data
-	for (var i = 0; i <= 430; i++) {
-		var values = keyedData[i]['values']
-		var xVal = 0.0;
-		var yVal = 0.0;
-		for (var j = 0; j < values.length; j++) {
-			xVal += Number(values[j]['gps_alt']);
-			yVal += Number(values[j][selection]);
-		}
-      	dataElement.push({
-	    	'x': xVal / values.length,
-	    	'y': yVal / values.length
-      	});
-    }	
+	var initial_time;
+	var pieces = selection.split("-");
 
-	dataArr.push({
-		key: 'Drone 1',
-		color: colors[0],
-		values: dataElement
-	});
+	for (var k = 1; k < arguments.length; k++) {
+		var dataElement = [];
+		var data = arguments[k];
+		if (!data) {
+			console.log("not defined, arg: "+k);
+			continue;
+		}
+
+		// Group by Time
+		var keyTime = d3.nest()
+	    	.key(function(d){return d.time; });
+	  	var keyedData = keyTime.entries(
+	    	data.map(function(d) {
+	      		return d;
+	    	})
+	  	);
+
+		for (var i = 0; i < keyedData.length; i++) {
+			var values = keyedData[i]['values']
+			var xVal = 0.0;
+			var yVal = 0.0;
+			for (var j = 0; j < values.length; j++) {
+				xVal += Number(values[j][pieces[1]]);
+				yVal += Number(values[j][pieces[0]]);
+			}
+			if (pieces[1] === "time") {
+				var split = values[0].time.split(":");
+				var xValue = Number(split[0])*3600 + Number(split[1])*60 + Number(split[2])
+				if (i == 0) {
+					initial_time = xValue;
+					xValue = 0;
+				} else {
+					xValue = Number(xValue) - Number(initial_time);
+				}
+			} else {
+				var xValue = xVal / values.length;
+			}
+			// Check if xValue is decreasing
+			// Otherwise results in ugly graphs wrt altitude
+			if (i == 0 || xValue >= dataElement[dataElement.length-1]['x']) {
+	      		dataElement.push({
+	 	    		'x': xValue,
+		    		'y': yVal / values.length
+	      		});
+	      	}
+	    }	
+		dataArr.push({
+			key: 'Drone '+k,
+			color: colors[k],
+			values: dataElement
+		});
+	}
 
 	return dataArr;
 }
