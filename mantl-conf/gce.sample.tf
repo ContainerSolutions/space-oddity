@@ -22,3 +22,8 @@ module "gce-dc" {
   edge_count = 1
 }
 
+resource "google_dns_managed_zone" "managed-zone" {
+  name = "drone"
+  dns_name = "drone.container-solutions.com"
+  description "Managed zone for drone.container-solutions.com"
+}
