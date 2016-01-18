@@ -1,5 +1,5 @@
 {
-  "id": "/docker/registry",
+  "id": "registry",
   "instances": 1,
   "cpus": 0.5,
   "mem": 1024.0,
