@@ -21,7 +21,7 @@
     },
     "volumes": [
       {
-        "hostPath": "/local/path/to/store/packages",
+        "hostPath": "/opt/packages",
         "containerPath": "/storage",
         "mode": "RW"
       }
