@@ -1,0 +1,31 @@
+port = ":80"
+graceTimeOut = 10
+logLevel = "ERROR"
+[web]
+address = ":8081"
+#CertFile = "/etc/traefik/certs/traefik-admin.cert.pem"
+#KeyFile = "/etc/traefik/certs/traefik-admin.key.pem"
+CertFile = "/etc/traefik/certs/drone.pem"
+KeyFile = "/etc/traefik/certs/dronepriv.pem"
+[marathon]
+endpoint = "http://marathon.service.consul:18080"
+domain = "drone.container-solutions.com"
+watch = true
+networkInterface = "eth0"
+[file]
+watch = true
+[[certificates]]
+CertFile = "/etc/traefik/certs/drone.pem"
+KeyFile = "/etc/traefik/certs/dronepriv.pem"
+ [backends]
+   [backends.backend1]
+     [backends.backend1.servers.server1]
+     url = "http://web.drone.container-solutions.com"
+     CertFile = "/etc/traefik/certs/drone.pem"
+     KeyFile = "/etc/traefik/certs/dronepriv.pem"
+[frontends]
+   [frontends.frontend1]
+   backend = "backend1"
+     [frontends.frontend1.routes.test_1]
+     rule = "Host"
+     value = "drone.container-solutions.com"
