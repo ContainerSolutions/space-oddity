@@ -5,7 +5,7 @@
   "rejoin_after_leave": true,
   "domain": "{{ consul_dns_domain }}",
   "retry_join": [ {{ consul_retry_join }} ],
-  "recursor": "{{ consul_recursor }}",
+  "recursors": [ "{{ consul_recursor }}" ],
 {% if consul_is_server|bool %}
   "server": true,
   "bootstrap_expect": {{ consul_bootstrap_expect }},
