@@ -19,4 +19,4 @@ consul_verify_incoming: true
 consul_verify_outgoing: true
 consul_allow_stale: true
 consul_max_stale: 5s
-consul_recursor: "169.254.169.254"
+consul_recursor: 169.254.169.254
