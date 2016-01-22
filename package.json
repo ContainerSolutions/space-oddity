@@ -1,22 +1,29 @@
 {
-  "name": "space-oddity",
-  "version": "1.0.0",
-  "description": "Drone Project",
-  "main": "server.js",
-  "dependencies": {
-    "express": "^4.13.3"
-  },
-  "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
-  },
-  "repository": {
-    "type": "git",
-    "url": "git+https://github.com/ContainerSolutions/space-oddity.git"
-  },
-  "author": "",
-  "license": "Apache-2.0",
-  "bugs": {
-    "url": "https://github.com/ContainerSolutions/space-oddity/issues"
-  },
-  "homepage": "https://github.com/ContainerSolutions/space-oddity#readme"
+	"scripts": {
+	  "start": "npm run serve | npm run dev",
+	  "serve": "./node_modules/.bin/http-server -p 8080",
+	  "dev": "webpack-dev-server --progress --colors --port 8090"
+	},
+    "name": "space-oddity",
+    "version": "1.0.0",
+    "description": "Drone Project",
+	"main": "droneChart.jsx",
+	"dependencies": {
+	  "react": "~0.14.6"
+	},
+	"devDependencies": {
+	  "webpack": "~1.4.4",
+	  "webpack-dev-server": "~1.6.5",
+	  "jsx-loader": "~0.11.2",
+	  "http-server": "~0.7.1"
+	},
+	"repository": {
+      "type": "git",
+      "url": "git+https://github.com/ContainerSolutions/space-oddity.git"
+    },
+    "bugs": {
+      "url": "https://github.com/ContainerSolutions/space-oddity/issues"
+    },
+    "homepage": "https://github.com/ContainerSolutions/space-oddity#readme",
+    "license": "Apache-2.0"
 }

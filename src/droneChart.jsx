@@ -1,3 +1,7 @@
+var ReactDOM = require('react-dom');
+var jQuery = require('jquery');
+var MapTest = require('./mapTest.jsx');
+
 var lineChart
 
 var ChartHeader = React.createClass({
@@ -60,11 +64,63 @@ var Viz = React.createClass({
 		};
 	},
 	loadData: function() {
-		d3.csv('data/drone1.csv',function(csv){
+		var dataUrl = 'http://localhost:8081/?index=drones*';
+		// var dataUrl = 'http://localhost:8081/?source=csv&file=data/droneData1.csv';
+
+		// *************
+		// Drone Data Service
+		// *************
+		jQuery.getJSON(dataUrl).then(function(data) {
+			var droneData = [];
+			for (var i = 0; i < data.length; i++) {
+				droneData[i] = data[i]; //._source;
+				// console.log('here');
+				// var date_time = data[i]._source.date_time.split(" ");
+				var date_time = data[i].date_time.split(" ");
+				// console.log('there');
+				droneData[i]['time'] = date_time[1];
+			}
+			// pull out relevant data....
+			// console.log(droneData);
 			this.setState({
-				data: csv
+				data: droneData
 			});
 		}.bind(this));
+
+		// *************
+		// Elasticsearch
+		// *************
+		// var client = new elasticsearch.Client();
+		// client.search({
+		// 	index: 'drones-2015.09.29',
+		// 	size: 1000,
+		// 	body: {
+		// 	}
+		// }).then(function (resp) {
+		// 	// console.log(resp.hits.hits);
+		// 	var data = [];
+		// 	for (var i = 0; i < resp.hits.hits.length; i++) {
+		// 		data[i] = resp.hits.hits[i]._source;
+		// 		// console.log('here');
+		// 		var date_time = resp.hits.hits[i]._source.date_time.split(" ");
+		// 		// console.log('there');
+		// 		data[i]['time'] = date_time[1];
+		// 	}
+		// 	// pull out relevant data....
+		// 	console.log(data);
+		// 	this.setState({
+		// 		data: data
+		// 	});
+		// }.bind(this));
+
+		// *************
+		// CSV
+		// *************
+		// d3.csv('data/drone1.csv',function(csv){
+		// 	this.setState({
+		// 		data: csv
+		// 	});
+		// }.bind(this));
 		d3.csv('data/drone2.csv',function(csv){
 			this.setState({
 				data2: csv
@@ -98,7 +154,7 @@ var Viz = React.createClass({
 
 ReactDOM.render(
 	<Viz />,
-	document.getElementById('react-hook')
+	document.getElementById('react-hook-2')
 );
 
 function drawLineChart(elementParent, data) {
@@ -165,6 +221,10 @@ function formatData(selection, args) {
 				yVal += Number(values[j][pieces[0]]);
 			}
 			if (pieces[1] === "time") {
+				if (!values[0].time) {
+					// TODO Figure out what's going on here
+					continue;
+				}
 				var split = values[0].time.split(":");
 				var xValue = Number(split[0])*3600 + Number(split[1])*60 + Number(split[2])
 				if (i == 0) {

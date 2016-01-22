@@ -1,14 +1,35 @@
 <!DOCTYPE html>
 <html>
-    <head>
-        <meta charset="utf-8">
-        <title>Space Oddity</title>
-        <!-- TODO Add CSS -->
-        <!-- <link rel="stylesheet" href="css/..."> -->
-    </head>
-    <body>
-        <div id="app"></div>
-        <script src="bundle.js"></script>
-        <!-- <script type="text/babel" src="src/main.js"></script> -->
-    </body>
+<head>
+    <title>Space Oddity</title>
+    <!-- include react -->
+    <script src="./node_modules/react/dist/react-with-addons.js"></script>
+    <link rel="stylesheet" href="css/bootstrap.min.css">
+    <link href="https://maxcdn.bootstrapcdn.com/font-awesome/4.2.0/css/font-awesome.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="css/nv.d3.css">
+    <link rel="stylesheet" href="css/drone_chart.css">
+</head>
+<body>
+    <div id="react-hook-2">
+    </div>
+    <div id="react-hook">
+        <!-- this is where the root react component will get rendered -->
+    </div>
+    <!-- include the webpack-dev-server script so our scripts get reloaded when we make a change -->
+    <!-- we'll run the webpack dev server on port 8090, so make sure it is correct -->
+    <script src="http://localhost:8090/webpack-dev-server.js"></script>
+    <!-- include the bundle that contains all our scripts, produced by webpack -->
+    <!-- the bundle is served by the webpack-dev-server, so serve it also from localhost:8090 -->
+    <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyDAfLXMlxrphTLbr5X9w8OOfeKQ-Ici3mg">
+        </script>
+    <script src="//d3js.org/d3.v3.min.js" charset="utf-8"></script>
+    <script src="src/lib/nv.d3.min.js"></script>
+    <script src="src/lib/jquery-2.2.0.min.js"></script>
+    <script src="src/lib/bootstrap.min.js"></script>
+    <script src="https://fb.me/react-0.14.6.js"></script>
+    <script src="https://fb.me/react-dom-0.14.6.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/babel-core/5.8.23/browser.min.js"></script>
+    <script src="src/lib/elasticsearch.js"></script>
+    <script type="text/javascript" src="http://localhost:8090/assets/bundle.js"></script>
+</body>
 </html>
