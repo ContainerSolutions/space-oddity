@@ -1,0 +1,31 @@
+#Listen on all interfaces
+interface=*
+
+addn-hosts=/etc/hosts
+
+# Never forward addresses in the non-routed address spaces.
+bogus-priv
+
+server=8.8.8.8
+server=8.8.4.4
+
+#Fix google internal. This probably isn't the right place, but it should work.
+server=/google.internal/169.254.169.254
+
+# configure DNS resolution to consul servers
+server=/{{ consul_dns_domain }}/127.0.0.1#8600
+
+{% for host in groups[consul_servers_group] | intersect(groups[consul_dc_group]) %}
+{% if hostvars[host].private_ipv4 != private_ipv4 %}
+server=/{{ consul_dns_domain }}/{{ hostvars[host].private_ipv4 }}#8600
+
+{% endif %}
+{% endfor %}
+
+{% if ansible_domain is defined and ansible_domain != '' %}
+{% for nameserver in nameservers | unique %}
+{% if nameserver != '127.0.0.1' %}
+server=/{{ ansible_domain }}/{{ nameserver }}
+{% endif %}
+{% endfor %}
+{% endif %}
