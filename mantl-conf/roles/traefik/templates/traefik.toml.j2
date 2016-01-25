@@ -1,0 +1,28 @@
+port = ":80"
+graceTimeOut = 10
+logLevel = "ERROR"
+
+[web]
+address = ":8081"
+CertFile = "/etc/traefik/certs/traefik-admin.cert.pem"
+KeyFile = "/etc/traefik/certs/traefik-admin.key.pem"
+
+[marathon]
+endpoint = "{{ traefik_marathon_endpoint }}"
+domain = "{{ traefik_marathon_domain }}"
+watch = true
+networkInterface = "eth0"
+
+[file]
+watch = true
+
+[backends]
+  [backends.backend1]
+    [backends.backend1.servers.server1]
+     url = "http://space-oddity.drone.container-solutions.com"
+[frontends]
+   [frontends.frontend1]
+   backend = "backend1"
+     [frontends.frontend1.routes.fe1]
+     rule = "Host"
+     value = "drone.container-solutions.com"
