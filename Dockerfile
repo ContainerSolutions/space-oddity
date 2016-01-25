@@ -3,6 +3,8 @@ FROM node:argon
 # Prepare app directory
 COPY . /usr/src/app
 
+ADD package.json package.json
+
 # Install dependencies
 WORKDIR /usr/src/app
 RUN npm install
@@ -10,10 +12,7 @@ RUN npm install
 # Build the app
 RUN npm build
 
-# Expose the app port
-EXPOSE 8080
+EXPOSE 80
 
-#Hmm, we should switch user here, shouldn't run as root...
-#
 # Start the app
 CMD [ "npm", "start" ]
