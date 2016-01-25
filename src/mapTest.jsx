@@ -116,7 +116,7 @@ var OverlayTest = React.createClass({
 
         return (
             <div id="overlay" className="overlay" style={overlayStyle}>
-                <img src="../tempMap.png" style={imageStyle}></img>
+                <img src="tempMap.png" style={imageStyle}></img>
             </div>
         );
     }

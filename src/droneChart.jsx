@@ -1,6 +1,8 @@
 var ReactDOM = require('react-dom');
 var jQuery = require('jquery');
 var MapTest = require('./mapTest.jsx');
+var d3 = require("d3");
+var nvd3 = require("nvd3");
 
 var lineChart
 
@@ -64,7 +66,8 @@ var Viz = React.createClass({
 		};
 	},
 	loadData: function() {
-		var dataUrl = 'http://localhost:8081/?index=drones*';
+		// var dataUrl = 'http://localhost:8081/?index=drones*';
+		var dataUrl = 'http://drone-data.drone.container-solutions.com/?index=drones*';
 		// var dataUrl = 'http://localhost:8081/?source=csv&file=data/droneData1.csv';
 
 		// *************
@@ -121,11 +124,32 @@ var Viz = React.createClass({
 		// 		data: csv
 		// 	});
 		// }.bind(this));
-		d3.csv('data/drone2.csv',function(csv){
-			this.setState({
-				data2: csv
-			});
-		}.bind(this));
+		// var dataUrlCsv = 'http://localhost:8081/?source=csv&file=data/drone2.csv';
+		// jQuery.getJSON(dataUrlCsv).then(function(data) {
+		// 	var droneData = [];
+		// 	for (var i = 0; i < data.length; i++) {
+		// 		droneData[i] = data[i]; //._source;
+		// 		// console.log('here');
+		// 		// var date_time = data[i]._source.date_time.split(" ");
+		// 		var date_time = data[i].date_time.split(" ");
+		// 		// console.log('there');
+		// 		droneData[i]['time'] = date_time[1];
+		// 	}
+		// 	// pull out relevant data....
+		// 	// console.log(droneData);
+		// 	this.setState({
+		// 		data2: droneData
+		// 	});
+		// }.bind(this));
+
+		// d3.text("data/drone2.csv", function(textData) {
+		// 	var csv = d3.csv.parseRows(textData);
+		// // })
+		// // d3.csv('data/drone2.csv',function(csv){
+		// 	this.setState({
+		// 		data2: csv
+		// 	});
+		// }.bind(this));
 	},
 	componentDidMount: function() {
 		this.loadData();
