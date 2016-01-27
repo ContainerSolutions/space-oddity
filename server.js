@@ -1,5 +1,6 @@
 'use strict';
 
+var basicAuth = require('basic-auth');
 const express = require('express');
 
 // Constants
@@ -8,7 +9,26 @@ const PORT = 8080;
 // App
 var app = express();
 
-app.get('/', function (req, res) {
+var auth = function (req, res, next) {
+  function unauthorized(res) {
+    res.set('WWW-Authenticate', 'Basic realm=Authorization Required');
+    return res.send(401);
+  };
+
+  var user = basicAuth(req);
+
+  if (!user || !user.name || !user.pass) {
+    return unauthorized(res);
+  };
+
+  if (user.name === 'cs' && user.pass === 'topSecret') {
+    return next();
+  } else {
+    return unauthorized(res);
+  };
+};
+
+app.get('/', auth, function (req, res) {
   res.sendFile(__dirname + '/index.html');
 });
 

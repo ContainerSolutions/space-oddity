@@ -1,8 +1,9 @@
 var ReactDOM = require('react-dom');
 var jQuery = require('jquery');
-var MapTest = require('./mapTest.jsx');
+// var MapTest = require('./mapTest.jsx');
 var d3 = require("d3");
 var nvd3 = require("nvd3");
+// var WeatherChart = require('./WeatherChart.jsx');
 
 var lineChart
 
@@ -68,7 +69,6 @@ var Viz = React.createClass({
 	loadData: function() {
 		// var dataUrl = 'http://localhost:8081/?index=drones*';
 		var dataUrl = 'http://drone-data.drone.container-solutions.com/?index=drones*';
-		// var dataUrl = 'http://localhost:8081/?source=csv&file=data/droneData1.csv';
 
 		// *************
 		// Drone Data Service
