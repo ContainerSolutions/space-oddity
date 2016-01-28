@@ -21,7 +21,7 @@ COPY .babelrc /usr/src/app/
 # Build the app
 RUN npm run build
 
-EXPOSE 80
+EXPOSE 8080
 
 # Start the app
 CMD [ "npm", "start" ]
