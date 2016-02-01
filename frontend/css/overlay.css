@@ -1,0 +1,30 @@
+.weather-points, .weather-points svg {
+  position: absolute;
+}
+
+.weather-points svg {
+  width: 60px;
+  height: 20px;
+  padding-right: 100px;
+  font: 10px sans-serif;
+}
+
+.weather-points circle {
+	/*opacity: 0.1;*/
+  /*fill: brown;*/
+  /*stroke: black;*/
+  /*stroke-width: 1.5px;*/
+}
+
+.caption {
+  font-weight: bold;
+}
+
+.key path {
+  display: none;
+}
+
+.key line {
+  stroke: #000;
+  shape-rendering: crispEdges;
+}

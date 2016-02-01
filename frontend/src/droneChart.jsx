@@ -1,6 +1,6 @@
 var ReactDOM = require('react-dom');
 var jQuery = require('jquery');
-// var MapTest = require('./mapTest.jsx');
+var WeatherMap = require('./weatherMap.jsx');
 var d3 = require("d3");
 var nvd3 = require("nvd3");
 // var WeatherChart = require('./WeatherChart.jsx');
@@ -67,12 +67,22 @@ var Viz = React.createClass({
 		};
 	},
 	loadData: function() {
-		// var dataUrl = 'http://localhost:8081/?index=drones*';
-		var dataUrl = 'http://drone-data.drone.container-solutions.com/?index=drones*';
+		var dataUrl = 'http://localhost:8081/?index=drones*';
+		// var dataUrl = 'http://drone-data.drone.container-solutions.com/?index=drones*';
 
 		// *************
 		// Drone Data Service
 		// *************
+		// jQuery.ajax({
+			// url: dataUrl,
+			// dataType: "json",
+			// username: "csUser",
+			// password: "testPassword",
+			// beforeSend: function(xhr) {
+			// 	console.log("called??");
+			// 	xhr.setRequestHeader("Authorization", "Basic " + btoa("csUser:testPassword"));
+			// }
+		// }).then(function(data) {
 		jQuery.getJSON(dataUrl).then(function(data) {
 			var droneData = [];
 			for (var i = 0; i < data.length; i++) {
