@@ -1,23 +1,9 @@
 var google = global.google;
 var d3 = require("d3");
+// var textures = require("textures");
 
 
 var layer = null;
-// var thresholds = [7, 8, 9, 10, 11, 12, 13, 14, 15];
-// var thresholds = [12.1, 12.2, 12.3, 12.4, 12.5, 12.6, 12.7, 12.8, 12.9];
-// var thresholds = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22];
-// var thresholds = [-5, 0, 5, 10, 15, 20, 25];
-
-// var interpolateColor = d3.interpolateHcl("#58ACFA", "#FF0000");
-// var interpolateColor = d3.interpolateHcl("#55075A", "#F7DBCA");
-
-// var threshold = d3.scale.threshold()
-//     .domain(thresholds)
-//     .range(d3.range(thresholds.length + 1));
-
-// var color = d3.scale.threshold()
-//     .domain(thresholds)
-//     .range(d3.range(thresholds.length + 1).map(function(d, i) { return interpolateColor(i / thresholds.length); }));
 
 function positionOverlayByDimensions(projectedLatLng) {
 
@@ -28,11 +14,32 @@ function positionOverlayByDimensions(projectedLatLng) {
 }
 
 function draw() {
-    // var projection = this.getProjection(),
-    //     projectedLatLng = projection.fromLatLngToDivPixel(this.point);
-    // positionOverlayByDimensions.call(this, projectedLatLng);
     var projection = this.getProjection(),
       padding = 10;
+
+    // Textures testing:
+    // var t1 = textures.circles()
+    //     .radius(4)
+    //     .fill("transparent")
+    //     .strokeWidth("2")
+    //     .stroke("firebrick")
+    //     .complement()
+    //     .thinner();
+
+    // var t2 = textures.circles()
+    //     .radius(4)
+    //     .fill("transparent")
+    //     .strokeWidth("2")
+    //     .stroke("firebrick")
+    //     .complement();
+
+    // var t3 = textures.circles()
+    //     .radius(4)
+    //     .fill("transparent")
+    //     .strokeWidth("2")
+    //     .stroke("firebrick")
+    //     .complement()
+    //     .thicker();
 
     var colorFunc = this.color;
 
@@ -42,12 +49,6 @@ function draw() {
     .enter().append("svg:svg")
       .each(transform)
       .attr("class", "marker");
-
-    // Add a circle.
-    // marker.append("svg:circle")
-    //   .attr("r", 4.5)
-    //   .attr("cx", padding)
-    //   .attr("cy", padding);
 
     // Add rectangle
     marker.append("svg:rect")
@@ -61,14 +62,22 @@ function draw() {
         return d3.select(this)
             .style("left", (d.x - padding) + "px")
             .style("top", (d.y - padding) + "px")
-            .style("opacity", 0.8)
+            .style("opacity", 0.4)
             .style("fill", function(d) {
+                // if (d.value.value > 15) {
+                //     return t1.url();
+                // } else if (d.value.value > 10) {
+                //     return t2.url();
+                // } else {
+                //     return t3.url();
+                // }
                 return colorFunc(d.value.value);
             });
     }
 }
 
 function onAdd() {
+    console.log('onAdd');
     var panes = this.getPanes();
     layer = d3.select(panes.overlayLayer).append("div")
         .attr("class", "weather-points");
@@ -77,30 +86,21 @@ function onAdd() {
     // this.map.addListener('dragend', updateMapData);
 }
 
-// function updateMapData() {
-//     console.log('updateMapData');
-//     var bounds = this.map.getBounds();
-//     bounds.getNothEast().lat();
-//     bounds.getNothEast().lng();
-//     bounds.getSouthWest().lat();
-//     bounds.getSouthWest().lng();
-
-// }
-
 function setData(data) {
-    console.log('set data');
+    // console.log('set data');
     this.data = JSON.parse(data);
     this.draw();
 }
 
-function DataOverlay(data, node, thresholds) {
+function DataOverlay(data, node, thresholds, colors) {
     console.log('created overlay');
     console.log(thresholds);
     this.el = node;
     this.data = data;
     thresholds = thresholds;
 
-    var interpolateColor = d3.interpolateHcl("#55075A", "#F7DBCA");
+    // var interpolateColor = d3.interpolateHcl("#55075A", "#F7DBCA");
+    var interpolateColor = d3.interpolateHcl(colors[0], colors[1]);
     
     var threshold = d3.scale.threshold()
     .domain(thresholds)

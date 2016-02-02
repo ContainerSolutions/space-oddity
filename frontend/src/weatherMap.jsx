@@ -37,18 +37,23 @@ var MapHeader = React.createClass({
 
 var MapDiv = React.createClass({
 
-    var tmp = true;
-    var rh = false;
+    getInitialState: function() {
+        return {
+            tmp: true,
+            rh: false
+        };
+    },
 
     sendSocketData: function(dataType) {
         if (dataType == "rh") {
-            rh = !rh;
+            this.state.rh = !this.state.rh;
         }
         if (dataType == "tmp") {
-            tmp = !tmp;
+            this.state.tmp = !this.state.tmp;
         }
-        console.log('sendSocketData');
-        droneSocket.send(JSON.stringify({"DataType": dataType}));
+        var dataTypeString = (this.state.tmp ? "tmp" : "") + (this.state.rh ? "rh" : "");
+        console.log(dataTypeString);
+        droneSocket.send(JSON.stringify({"DataType": dataTypeString}));
     },
 
     render: function() {
@@ -184,16 +189,16 @@ var WeatherOverlay = React.createClass({
         droneSocket.onmessage = function(event) {
             // console.log(JSON.parse(event.data)[0]);
             if (JSON.parse(event.data)[0].type === "tmp") {
-                console.log('set data tmp');
+                // console.log('set data tmp');
                 tmpOverlay.setData(event.data);
             } else {
-                console.log('set data rh');
+                // console.log('set data rh');
                 rhOverlay.setData(event.data);
             }
         }   
 
-        tmpOverlay = new DataOverlay([], el, [-5, 0, 5, 10, 15, 20, 25]);
-        rhOverlay = new DataOverlay([], el, [0, 25, 50, 75, 100]);
+        tmpOverlay = new DataOverlay([], el, [-5, 0, 5, 10, 15, 20, 25], ["#55075A", "#F7DBCA"]);
+        rhOverlay = new DataOverlay([], el, [0, 25, 50, 75, 100], ["#f2f0f7", "#54278f"]);
         if (map) {
             tmpOverlay.setMap(map);
             rhOverlay.setMap(map);
@@ -202,8 +207,13 @@ var WeatherOverlay = React.createClass({
 
     componentDidUpdate: function () {
         console.log('update map');
-        tmpOverlay.setMap(this.props.map);
-        rhOverlay.setMap(this.props.map);
+        console.log(tmpOverlay.getMap());
+        if (tmpOverlay.getMap() == null) {
+            tmpOverlay.setMap(this.props.map);
+        }
+        if (rhOverlay.getMap() == null) {
+            rhOverlay.setMap(this.props.map);
+        }
         if (this.props.map) {
             // var bounds = this.props.map.getBounds();
             // var maxLat = bounds.getNorthEast().lat();
