@@ -12,10 +12,10 @@ logstash_log4j_port: 4560
 
 # Logstash output Elasticsearch
 # If defined - logstash will send all the messages to elasticsearch cluster
-logstash_output_elasticsearch:
-  host: "elasticsearch.service.consul"
-  protocol: "http"
-  port: "4000"
+#logstash_output_elasticsearch:
+#  host: "elasticsearch.service.consul"
+#  protocol: "http"
+#  port: "4000"
 
 # Logstash output Kafka
 # If defined - logstash will send all the messages to configured kafka brokers
