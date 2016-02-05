@@ -1,0 +1,36 @@
+/* globals */
+h4 {
+	font-family: 'Terminal Dosis';
+	font-size: 24px;
+	font-style: normal;
+	font-variant: normal;
+	font-weight: 500;
+	line-height: 26.4px;
+}
+
+body {
+	font-family: Lato;
+	font-size: 14px;
+	font-style: normal;
+	font-variant: normal;
+	font-weight: 400;
+	line-height: 20px;
+	background-image: url("../drone_bg.png");
+}
+
+.legend {
+	height: 50px;
+}
+
+.sliderDiv {
+	padding-bottom: 20px;
+	padding-top: 20px;
+}
+
+.sliderDiv .sliderTime {
+	width: 420px;
+}
+
+.weatherInfoDiv {
+	padding-top: 50px;
+}
