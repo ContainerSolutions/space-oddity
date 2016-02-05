@@ -67,7 +67,7 @@ var MapDiv = React.createClass({
     componentDidMount: function() {
 
         // Open WebSocket to Data Service
-        droneSocket = new WebSocket("ws://localhost:8081/socket");
+        droneSocket = new WebSocket("ws://drone.container-solutions.com/socket");
         droneSocket.onopen = function (event) {
             console.log('sending data...');
 

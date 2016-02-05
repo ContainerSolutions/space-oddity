@@ -19,10 +19,18 @@ watch = true
 [backends]
   [backends.backend1]
     [backends.backend1.servers.server1]
+     url = "http://drone-data.drone.container-solutions.com/socket"
+  [backends.backend2]
+    [backends.backend2.servers.server1]
      url = "http://space-oddity.drone.container-solutions.com"
 [frontends]
    [frontends.frontend1]
    backend = "backend1"
      [frontends.frontend1.routes.fe1]
+     rule = "Path"
+     value = "/socket"
+   [frontends.frontend2]
+   backend = "backend2"
+     [frontends.frontend2.routes.fe2]
      rule = "Host"
      value = "drone.container-solutions.com"
