@@ -5,6 +5,11 @@ var d3 = require("d3");
 
 var layer = null;
 
+// var thick = textures.lines().thicker().stroke("#8948E5");
+// var norm = textures.lines().stroke("#8948E5");
+// var thin = textures.lines().thinner().stroke("#8948E5");
+
+
 function positionOverlayByDimensions(projectedLatLng) {
 
     var offsetHeight = this.el.offsetHeight,
@@ -14,7 +19,7 @@ function positionOverlayByDimensions(projectedLatLng) {
 }
 
 function draw() {
-    // console.log("~~~~~~~~~~~DRAW: " + this);
+    // console.log("DRAW: " + this);
     var projection = this.getProjection(),
       padding = 10;
 
@@ -42,7 +47,8 @@ function draw() {
     //     .complement()
     //     .thicker();
 
-    var colorFunc = this.color;
+    // var colorFunc = this.color;
+    var textures = this.textures;
 
     // var width = 960,
         // height = 500;
@@ -51,6 +57,15 @@ function draw() {
     //             .attr("width", width)
     //             .attr("height", height);
 
+    if (!layer) {
+        return;
+    }
+
+    // console.log('draw: ' + this.data.length);
+    if (this.data.length < 1) {
+        layer.selectAll("svg").remove();
+        return;
+    }
     var marker = layer.selectAll("svg")
       .data(d3.entries(this.data))
       .each(transform) // update existing markers
@@ -59,6 +74,13 @@ function draw() {
       .attr("class", "marker");
 
     // console.log('Data: ' + this.data);
+
+    for (var k in textures) {
+        marker.call(textures[k]);
+    }
+    // marker.call(textures[0]);
+    // marker.call(textures[1]);
+    // marker.call(textures[2]);
 
     // Add rectangle
     marker.append("svg:rect")
@@ -108,6 +130,18 @@ function draw() {
             .style("top", (d.y - padding) + "px")
             .style("opacity", 0.6)
             .style("fill", function(d) {
+                // return textures[0].url();
+                var t = null;
+                for (var k in textures) {
+                    // console.log('...');
+                    if (d.value.value > k) {
+                        t = textures[k];
+                    }
+                }
+                if (t == null) {
+                    return "none";
+                }
+                return t.url();
                 // if (d.value.value > 15) {
                 //     return t1.url();
                 // } else if (d.value.value > 10) {
@@ -115,13 +149,13 @@ function draw() {
                 // } else {
                 //     return t3.url();
                 // }
-                return colorFunc(d.value.value);
+                // return colorFunc(d.value.value);
             });
     }
 }
 
 function onAdd() {
-    console.log('onAdd');
+    // console.log('onAdd');
     var panes = this.getPanes();
     // console.log(panes);
     // console.log(this.getMap());
@@ -133,29 +167,36 @@ function onAdd() {
 }
 
 function setData(data) {
-    // console.log('set data: ' + data);
-    this.data = JSON.parse(data);
+    // console.log('set data: ' + data[0]);
+    if (data && data.length > 0) {
+        this.data = JSON.parse(data);
+    } else {
+        // console.log('no data');
+        this.data = data;
+    }
     this.draw();
 }
 
-function DataOverlay(data, node, thresholds, colors) {
+function DataOverlay(data, node, textures) { //} thresholds, colors) {
     // console.log('created overlay');
     // console.log(thresholds);
     this.el = node;
     // console.log("Overlay, Node: " + node.innerHTML + " Colors: " + colors);
     this.data = data;
-    thresholds = thresholds;
+
+    this.textures = textures;
+    // thresholds = thresholds;
 
     // var interpolateColor = d3.interpolateHcl("#55075A", "#F7DBCA");
-    var interpolateColor = d3.interpolateHcl(colors[0], colors[1]);
+    // var interpolateColor = d3.interpolateHcl(colors[0], colors[1]);
     
-    var threshold = d3.scale.threshold()
-    .domain(thresholds)
-    .range(d3.range(thresholds.length + 1));
+    // var threshold = d3.scale.threshold()
+    // .domain(thresholds)
+    // .range(d3.range(thresholds.length + 1));
 
-    this.color = d3.scale.threshold()
-        .domain(thresholds)
-        .range(d3.range(thresholds.length + 1).map(function(d, i) { return interpolateColor(i / thresholds.length); }));
+    // this.color = d3.scale.threshold()
+    //     .domain(thresholds)
+    //     .range(d3.range(thresholds.length + 1).map(function(d, i) { return interpolateColor(i / thresholds.length); }));
 
     // this.el.style.position = 'absolute';
 }

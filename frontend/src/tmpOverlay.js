@@ -41,7 +41,6 @@ function draw() {
         .attr("width", 15)
         .attr("height", 25);
 
-
     function transform(d) {
         d = new google.maps.LatLng(d.value.lat, d.value.lon);
         d = projection.fromLatLngToDivPixel(d);
@@ -67,26 +66,34 @@ function draw() {
 function onAdd() {
     console.log('onAdd');
     var panes = this.getPanes();
+
     layer = d3.select(panes.overlayLayer).append("div")
         .attr("class", "weather-points");
 }
 
 function setData(data) {
-    this.data = JSON.parse(data);
+    if (data && data.length > 0) {
+        this.data = JSON.parse(data);
+    } else {
+        // console.log('no data');
+        this.data = data;
+    }
     this.draw();
 }
 
-function FogOverlay(data, node, textures) {
+function tmpOverlay(data, node, textures) {
     this.el = node;
     this.data = data;
+
     this.textures = textures;
+
 }
 
-FogOverlay.prototype = Object.create(google.maps.OverlayView.prototype);
-FogOverlay.prototype.constructor = FogOverlay;
+tmpOverlay.prototype = Object.create(google.maps.OverlayView.prototype);
+tmpOverlay.prototype.constructor = tmpOverlay;
 
-FogOverlay.prototype.onAdd = onAdd;
-FogOverlay.prototype.draw = draw;
-FogOverlay.prototype.setData = setData;
+tmpOverlay.prototype.onAdd = onAdd;
+tmpOverlay.prototype.draw = draw;
+tmpOverlay.prototype.setData = setData;
 
-module.exports = FogOverlay;
+module.exports = tmpOverlay;

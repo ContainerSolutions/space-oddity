@@ -6,6 +6,7 @@ h4 {
 	font-variant: normal;
 	font-weight: 500;
 	line-height: 26.4px;
+	color: #333333;
 }
 
 body {
@@ -16,6 +17,7 @@ body {
 	font-weight: 400;
 	line-height: 20px;
 	background-image: url("../drone_bg.png");
+	color: #333333;
 }
 
 .legend {
@@ -32,5 +34,91 @@ body {
 }
 
 .weatherInfoDiv {
-	padding-top: 50px;
+	font-size: 12px;
+}
+
+.mapHeader label {
+	float: right;
+	vertical-align: bottom;
+}
+
+.form-label {
+	float: left;
+	margin-right: 55px;
+}
+
+#hmdBtn {
+	background: #333333; 
+	border-radius: 50%;
+	float: right;
+	vertical-align: bottom;
+}
+
+#hmdBtn span {
+	color: #ff9510;
+}
+
+#tempBtn {
+	background: #333333; 
+	border-radius: 50%;
+	float: right;
+	vertical-align: bottom;
+}
+
+#tempBtn span {
+	color: #ff0031;
+}
+
+#fogBtn {
+	background: #333333; 
+	border-radius: 50%;
+	float: right;
+	vertical-align: bottom;
+}
+
+#fogBtn span {
+	padding-left: 4px;
+	padding-right: 4px;
+	color: #8948e5;
+}
+
+#fogBtnLbl {
+	float: right;
+	vertical-align: bottom;
+}
+
+#fogLabel {
+	float: left;
+	padding-right: 20px;
+}
+
+#fogLegend {
+	margin-left: 20px;
+}
+
+#rhLabel {
+	float: left;
+	padding-right: 50px;
+}
+
+#tmpLabel {
+	float: left;
+	padding-right: 20px;
+}
+
+#tmpLegendRow {
+	margin-top: 30px;
+}
+
+#sliderLabel {
+	opacity: 0.5;
+}
+
+#warningDiv {
+	margin-top: 70px;
+	margin-left: 20px;
+	margin-right: 20px;
+	color: white;
+	background: #8948e5;
+	/*height: 30px;*/
 }

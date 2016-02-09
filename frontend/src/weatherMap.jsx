@@ -1,6 +1,20 @@
 var DataOverlay = require('./dataOverlay.js');
 var FogOverlay = require('./fogOverlay.js');
+var TmpOverlay = require('./tmpOverlay.js');
 var ReactDOM = require('react-dom');
+var textures = require("textures");
+
+var thickRh = textures.circles().radius(2).fill("transparent").strokeWidth(1).stroke("#FF9510").size(5);
+var normRh = textures.circles().radius(2).fill("transparent").strokeWidth(1).stroke("#FF9510").size(8);
+var thinRh = textures.circles().radius(2).fill("transparent").strokeWidth(1).stroke("#FF9510").size(11);
+
+var thickTmp = textures.lines().orientation("3/8", "7/8").strokeWidth(1).stroke("#FF0031").size(8);
+var normTmp = textures.lines().orientation("3/8", "7/8").strokeWidth(1).stroke("#FF0031").size(15);
+var thinTmp = textures.lines().orientation("3/8", "7/8").strokeWidth(1).stroke("#FF0031").size(20);
+
+var thickFog = textures.lines().strokeWidth(1).size(5).stroke("#8948E5");
+var normFog = textures.lines().strokeWidth(1).size(10).stroke("#8948E5");
+var thinFog = textures.lines().strokeWidth(1).size(15).stroke("#8948E5");
 // var Slider = require('react-rangeslider');
 // var Volume = require('./test.jsx');
 
@@ -11,15 +25,21 @@ var MapHeader = React.createClass({
 
     render: function() {
         return (
-            <div className='row text-center'>
+            <div className='row text-center mapHeader'>
                 <div className='span2 text-left'>
                     <h4>DRONE DATA</h4>
                 </div>
-                <div className='span2'>
-                    <button id="tempBtn" type="button" onClick={this.props.toggleTemp}>TEMPERATURE</button>
+                <div className='span2 text-right'>
+                    <label id="tempBtnLbl" htmlFor="tempBtn">TEMPERATURE</label>
+                    <button id="tempBtn" type="button" onClick={this.props.toggleTemp}>
+                        <span className="fa fa-plus" aria-hidden="true"></span>
+                    </button>
                 </div>
-                <div className='span2'>
-                    <button id="hmdBtn" type="button" onClick={this.props.toggleHumid}>HUMIDITY</button>
+                <div className='span2 text-right'>
+                    <label id="hmdBtnLbl" htmlFor="hmdBtn">HUMIDITY</label>
+                    <button id="hmdBtn" type="button" onClick={this.props.toggleHumid}>
+                        <span className="fa fa-circle-o" aria-hidden="true"></span>
+                    </button>
                 </div>
             </div>
         );
@@ -29,20 +49,47 @@ var MapHeader = React.createClass({
 var MapDiv = React.createClass({
 
     getInitialState: function() {
+        // var thickRh = textures.circles().radius(2).fill("transparent").strokeWidth(1).stroke("#FF9510").size(5);
+        // var normRh = textures.circles().radius(2).fill("transparent").strokeWidth(1).stroke("#FF9510").size(8);
+        // var thinRh = textures.circles().radius(2).fill("transparent").strokeWidth(1).stroke("#FF9510").size(11);
+        var textureArrayRh = {};
+        textureArrayRh[80] = thickRh;
+        textureArrayRh[60] = normRh;
+        textureArrayRh[40] = thinRh;
+
+        var thickTmpHack = textures.circles().radius(2).fill("transparent").strokeWidth(1).stroke("#FF0031").size(5);
+        var normTmpHack = textures.circles().radius(2).fill("transparent").strokeWidth(1).stroke("#FF0031").size(8);
+        var thinTmpHack = textures.circles().radius(2).fill("transparent").strokeWidth(1).stroke("#FF0031").size(11);
+        var textureArrayTmp = {};
+        textureArrayTmp[15] = thickTmpHack;
+        textureArrayTmp[10] = normTmpHack;
+        textureArrayTmp[5] = thinTmpHack;
+
+        var thickFogHack = textures.circles().radius(2).fill("transparent").strokeWidth(1).stroke("#8948E5").size(5);
+        var normFogHack = textures.circles().radius(2).fill("transparent").strokeWidth(1).stroke("#8948E5").size(8);
+        var thinFogHack = textures.circles().radius(2).fill("transparent").strokeWidth(1).stroke("#8948E5").size(11);
+        var fogPatterns = {};
+        fogPatterns[80] = thickFogHack;
+        fogPatterns[60] = normFogHack;
+        fogPatterns[40] = thinFogHack;
+
         return {
-            tmp: true,
-            rh: false,
+            tmp: false,
+            rh: true,
             // tmpThreshold: [-5, 0, 5, 10, 15, 20, 25],
             tmpThreshold:[0, 10, 20],
             rhThreshold: [0, 25, 50, 75, 100],
             fogThreshold: [50, 75, 100],
             // fogColors: ["#D3F9CB", "#2ca02c"],
             // fogColors: ["#FFFFFF", "#2ca02c"],
-            fogColors: ["#F3ECFC", "#8948E5"],
+            // fogColors: ["#F3ECFC", "#8948E5"],
+            fogPatterns: fogPatterns,
+            tmpPatterns: textureArrayTmp,
+            rhPatterns: textureArrayRh,
             // tmpColors: ["#F7DBCA", "#55075A"],
-            tmpColors: ["#FFE5EA", "#FF0031"],
+            // tmpColors: ["#FFE5EA", "#FF0031"],
             // rhColors: ["#f2f0f7", "#54278f"],
-            rhColors: ["#FFF4E7", "#FF9510"],
+            // rhColors: ["#FFF4E7", "#FF9510"],
             tmpData: [],
             rhData: [],
             fogData: []
@@ -57,17 +104,52 @@ var MapDiv = React.createClass({
         }
         if (dataType == "tmp") {
             this.state.tmp = !this.state.tmp;
-            stop = !this.state.rh;
+            stop = !this.state.tmp;
         }
         var dataTypeString = (this.state.tmp ? "tmp" : "") + (this.state.rh ? "rh" : "");
-        console.log(dataTypeString);
+        console.log("Sending socket data: " + dataTypeString + " stop? " + stop);
         droneSocket.send(JSON.stringify({"dataType": [dataType], "stop": stop}));
+        if (stop) {
+            var that = this;
+            if (dataType == "tmp") {
+                setTimeout(function(){that.setState({tmpData: []})}, 1000);
+                // setTimeout(this.setState({tmpData: []}), ;
+            } else if (dataType == "rh") {
+                // this.setState({rhData: []});
+                setTimeout(function(){that.setState({rhData: []})}, 1000);
+            }
+        }
     },
 
     componentDidMount: function() {
 
+        this.startSocket();
+
+        // Build Legends
+        var svg = d3.select('#tmpLegend svg');
+        var tmpX = d3.scale.linear()
+          .domain([0, 20])
+          .range([0, 280]);
+        this.buildLegend(this.state.tmpPatterns, svg, tmpX);
+
+        var svg2 = d3.select('#rhLegend svg');
+        var rhX = d3.scale.linear()
+          .domain([0, 100])
+          .range([0, 280]);
+        this.buildLegend(this.state.rhPatterns, svg2, rhX);
+
+        var svg3 = d3.select('#fogLegend svg');
+        var fogX = d3.scale.linear()
+          .domain([0, 100])
+          .range([0, 280]);
+        this.buildLegend(this.state.fogPatterns, svg3, fogX);
+    },
+
+    startSocket: function() {
         // Open WebSocket to Data Service
-        droneSocket = new WebSocket("ws://localhost:8081/socket");
+        // droneSocket = new WebSocket("ws://localhost:8081/socket");
+        droneSocket = new WebSocket("ws://drone.container-solutions.com/socket");
+        
         droneSocket.onopen = function (event) {
             console.log('sending data...');
 
@@ -78,7 +160,7 @@ var MapDiv = React.createClass({
             var maxLon = 0.0; //bounds.getNorthEast().lng();
             var minLat = 0.0; //bounds.getSouthWest().lat();
             var minLon = 0.0; //bounds.getSouthWest().lng();
-            droneSocket.send("{DataType: [\"tmp\"], Altitude: 110, DateTime: \"19_12\", MinLat: " + minLat + ", MaxLat: " + maxLat + ", MinLon: " + minLon + ", MaxLon: " + maxLon + "}");
+            droneSocket.send("{DataType: [\"rh\"], Altitude: 1700, DateTime: \"19_12\", MinLat: " + minLat + ", MaxLat: " + maxLat + ", MinLon: " + minLon + ", MaxLon: " + maxLon + "}");
         }
 
         droneSocket.onmessage = function(event) {
@@ -97,7 +179,6 @@ var MapDiv = React.createClass({
                 // this.refs.wMap.props.tmpData = event.data;
             } else if (JSON.parse(event.data)[0].type === "rh") {
                 // rhOverlay.setData(event.data);
-                // this.state.rhData = event.data;
                 this.setState({rhData: event.data});
                 // this.props.rhData = event.data;
                 // this.refs.wMap.props.rhData = event.data;
@@ -108,37 +189,14 @@ var MapDiv = React.createClass({
             }
         }.bind(this);
 
-        // Build Legends
-        var svg = d3.select('#tmpLegend svg');
-        var tmpX = d3.scale.linear()
-          .domain([0, 20])
-          .range([0, 280]);
-        this.buildLegend(this.state.tmpThreshold, this.state.tmpColors, svg, tmpX);
-
-        var svg2 = d3.select('#rhLegend svg');
-        var rhX = d3.scale.linear()
-          .domain([0, 100])
-          .range([0, 280]);
-        this.buildLegend(this.state.rhThreshold, this.state.rhColors, svg2, rhX);
-
-        var svg3 = d3.select('#fogLegend svg');
-        var fogX = d3.scale.linear()
-          .domain([0, 100])
-          .range([0, 280]);
-        this.buildLegend(this.state.fogThreshold, this.state.fogColors, svg3, fogX);
+        droneSocket.onclose = function(event) {
+            console.log('on close received');
+            setTimeout(function(){startSocket()}, 5000);
+        }.bind(this);
     },
 
-    // componentWillReceiveProps: function (nextProps) {
-    //     console.log('MapDiv - componentWillReceiveProps');
-    // },
 
-    buildLegend: function(thresholds, colors, el, x) {
-        var interpolateColor = d3.interpolateHcl(colors[0], colors[1]);
-
-        var color = d3.scale.threshold()
-          .domain(thresholds)
-          .range(d3.range(thresholds.length + 1).map(function(d, i) { return interpolateColor(i / thresholds.length); }));
-
+    buildLegend: function(patterns, el, x) {
         var xAxis = d3.svg.axis()
           .scale(x)
           .orient("bottom")
@@ -153,21 +211,55 @@ var MapDiv = React.createClass({
         key.append("rect")
           .attr("x", -10)
           .attr("y", -10)
-          .attr("width", 310)
+          .attr("width", 100)
           .attr("height", 40)
           // .style("fill", "white")
           .style("fill-opacity", 0.0);
 
+        // console.log('x: ' + x);
+        console.log('ticks: ' + x.ticks(4));
+        console.log('pairs: ' + d3.pairs(x.ticks(4)));
+
+        for (var k in patterns) {
+            key.call(patterns[k]);
+        }
+
+        var count = 0;
         key.selectAll(".band")
-          .data(d3.pairs(x.ticks(10)))
+          .data(d3.pairs(x.ticks(4)))
         .enter().append("rect")
           .attr("class", "band")
           .attr("height", 13)
-          .attr("x", function(d) { return x(d[0]); })
-          .attr("width", function(d) { return x(d[1]) - x(d[0]); })
-          .style("fill", function(d) { return color(d[0]); });
+          .attr("x", function(d) { //console.log('x: ' + d[0]); 
+            return x(d[0]); })
+          .attr("width", function(d) { //console.log('width: ' + d[1]); 
+            return x(d[1]) - x(d[0]); })
+          .style("fill", function(d) { //console.log('fill: ' + d[0]); 
+            console.log('Val: ' + d[0]);
+            // var temp = count;
+            // count = count + 1;
+            var p = patterns[d[0]];
+            if (!p) {
+                return "none";
+            } else {
+                // console.log('p: ' + p);
+                // console.log('p.url: ' + p.url());
+                return p.url();
+            }
+            // return patterns[d[0]].url(); 
+        });
 
         key.call(xAxis);
+    },
+
+    sliderChange: function(e) {
+        // console.log('Slider Parent changed: ' + e.target.value);
+        this.setState({time: e.target.value});
+        // TODO convert slider val to Date Time
+        var hour = parseInt(e.target.value) + 11;
+        var dateTime = "19_" + hour;
+        // console.log('date_time: ' + dateTime);
+        droneSocket.send(JSON.stringify({"dataType": ["fog"], "altitude": 1700, "dateTime":  dateTime }));
     },
 
     render: function() {
@@ -180,15 +272,15 @@ var MapDiv = React.createClass({
                     <div className='row'>
                         <WeatherMap tmpData={this.state.tmpData} rhData={this.state.rhData}/>
                     </div>
-                    <div className="row">
+                    <div className="row" id="tmpLegendRow">
                         <div className="span6 legend" id='tmpLegend'>
-                            <label htmlFor="tmpSvg">TEMPERATURE</label>
+                            <label id="tmpLabel" htmlFor="tmpSvg">TEMPERATURE</label>
                             <svg id="tmpSvg"></svg>
                         </div>
                     </div>
                     <div className="row">
                         <div className="span6 legend" id='rhLegend'>
-                            <label htmlFor="rhSvg">HUMIDITY</label>
+                            <label id="rhLabel" htmlFor="rhSvg">HUMIDITY</label>
                             <svg id="rhSvg"></svg>
                         </div>
                     </div>
@@ -199,15 +291,19 @@ var MapDiv = React.createClass({
                             <h4>WEATHER PREDICTION - FOG</h4>
                         </div>
                         <div className='span2'>
-                            <button id="tempBtn" type="button">FOG</button>
+                            <label id="fogBtnLbl" htmlFor="fogBtn">FOG</label>
+                            <button id="fogBtn" type="button" onClick={this.props.toggleTemp}>
+                                <span aria-hidden="true">/</span>
+                            </button>
                         </div>
                     </div>
                     <div className='row'>
-                        <PredictionMap fogData={this.state.fogData}/>
+                        <PredictionMap fogData={this.state.fogData} time={this.state.time}/>
                     </div>
-                    <PredMapSlider />
+                    <PredMapSlider onChange={this.sliderChange} val={this.state.time}/>
                     <div id='fogLegend' className="legend">
-                        <svg></svg>
+                       <label id="fogLabel" htmlFor="fogSvg">FOG</label>
+                       <svg id="fogSvg"></svg>
                     </div>
                     <WeatherInfo />
                 </div>
@@ -218,37 +314,41 @@ var MapDiv = React.createClass({
 
 var PredMapSlider = React.createClass({
 
-    sliderChange: function(data) {
-        console.log('Slide changed: ' + data);
-    },
-
     getDefaultProps: function () {
         return {
-            minVal: '12',
-            maxVal: '23',
-            val: '12',
+            minVal: '1',
+            maxVal: '12',
+            val: '1',
             sliderLabel: "12:00 - 15:00 - 18:00 - 21:00 - 00:00"
         };
+    },
+
+    componentDidMount: function() {
+
     },
 
     render: function() {
         return (
             <div id="sliderDiv" className="span6 sliderDiv">
-                <label className="form-label" htmlFor="sliderTime">{this.props.sliderLabel}</label>
-                <input type="range" className="sliderTime" id="sliderTime" min={this.props.minVal} max={this.props.maxVal} step="1" onChange={this.sliderChange} list="timeList"/>
+                <label className="form-label" htmlFor="sliderTime">12:00</label>
+                <label className="form-label" htmlFor="sliderTime">15:00</label>
+                <label className="form-label" htmlFor="sliderTime">18:00</label>
+                <label className="form-label" htmlFor="sliderTime">21:00</label>
+                <label className="form-label" htmlFor="sliderTime">00:00</label>
+                <input type="range" className="sliderTime" id="sliderTime" min={this.props.minVal} max={this.props.maxVal} step="1" onChange={this.props.onChange} value={this.props.val} list="timeList"/>
                 <datalist id="timeList">
+                    <option>1</option>
+                    <option>2</option>
+                    <option>3</option>
+                    <option>4</option>
+                    <option>5</option>
+                    <option>6</option>
+                    <option>7</option>
+                    <option>8</option>
+                    <option>9</option>
+                    <option>10</option>
+                    <option>11</option>
                     <option>12</option>
-                    <option>13</option>
-                    <option>14</option>
-                    <option>15</option>
-                    <option>16</option>
-                    <option>17</option>
-                    <option>18</option>
-                    <option>19</option>
-                    <option>20</option>
-                    <option>21</option>
-                    <option>22</option>
-                    <option>23</option>
                 </datalist>
             </div>
         );
@@ -286,7 +386,7 @@ var WeatherMap = React.createClass({
         var maxLon = bounds.getNorthEast().lng();
         var minLat = bounds.getSouthWest().lat();
         var minLon = bounds.getSouthWest().lng();
-        droneSocket.send("{\"Altitude\": 110, \"DateTime\": \"19_12\", \"MinLat\": " + minLat + ", \"MaxLat\": " + maxLat + ", \"MinLon\": " + minLon + ", \"MaxLon\": " + maxLon + "}");
+        droneSocket.send("{\"Altitude\": 1700, \"DateTime\": \"19_12\", \"MinLat\": " + minLat + ", \"MaxLat\": " + maxLat + ", \"MinLon\": " + minLon + ", \"MaxLon\": " + maxLon + "}");
     },
 
     componentDidMount: function () {
@@ -416,14 +516,28 @@ var WeatherOverlay = React.createClass({
         //         rhOverlay.setData(event.data);
         //     }
         // }   
+        // var thickRh = textures.circles().radius(2).fill("transparent").strokeWidth(1).stroke("#FF9510").size(5);
+        // var normRh = textures.circles().radius(2).fill("transparent").strokeWidth(1).stroke("#FF9510").size(8);
+        // var thinRh = textures.circles().radius(2).fill("transparent").strokeWidth(1).stroke("#FF9510").size(11);
+        var textureArrayRh = {};
+        textureArrayRh[70] = thickRh;
+        textureArrayRh[60] = normRh;
+        textureArrayRh[55] = thinRh;
 
-        tmpOverlay = new DataOverlay([], el, this.state.tmpThreshold, this.state.tmpColors);
-        rhOverlay = new DataOverlay([], el, this.state.rhThreshold, this.state.rhColors);
+        // var thickTmp = textures.lines().orientation("3/8", "7/8").strokeWidth(1).stroke("#FF0031").size(8);
+        // var normTmp = textures.lines().orientation("3/8", "7/8").strokeWidth(1).stroke("#FF0031").size(15);
+        // var thinTmp = textures.lines().orientation("3/8", "7/8").strokeWidth(1).stroke("#FF0031").size(20);
+        var textureArrayTmp = {};
+        textureArrayTmp[11] = thickTmp;
+        textureArrayTmp[10] = normTmp;
+        textureArrayTmp[8] = thinTmp;
 
+        tmpOverlay = new TmpOverlay([], el, textureArrayTmp);
+        rhOverlay = new DataOverlay([], el, textureArrayRh); 
         if (map) {
             console.log("setting map for tmp and rh");
             tmpOverlay.setMap(map);
-            rhOverlay.setMap(map);
+            // rhOverlay.setMap(map);
         }
     },
 
@@ -440,13 +554,13 @@ var WeatherOverlay = React.createClass({
             rhOverlay.setMap(this.props.map);
         }
 
-        if (this.props.tmpData && this.props.tmpData.length > 0) {
+        // if (this.props.tmpData && this.props.tmpData.length > 0) {
             tmpOverlay.setData(this.props.tmpData);
-        }
-        if (this.props.rhData && this.props.rhData.length > 0) {
-            console.log("setting RH data");
+        // }
+        // if (this.props.rhData && this.props.rhData.length > 0) {
+            // console.log("setting RH data");
             rhOverlay.setData(this.props.rhData);
-        }
+        // }
 
         // console.log(this.props.tmpData);
 
@@ -499,7 +613,6 @@ var WeatherOverlay = React.createClass({
     }
 });
 
-
 // TODO - Merge / Generesize with WeatherMap
 var PredictionMap = React.createClass({
 
@@ -534,7 +647,7 @@ var PredictionMap = React.createClass({
         var maxLon = bounds.getNorthEast().lng();
         var minLat = bounds.getSouthWest().lat();
         var minLon = bounds.getSouthWest().lng();
-        droneSocket.send("{\"DataType\": [\"fog\"],\"Altitude\": 110, \"DateTime\": \"19_12\", \"MinLat\": " + minLat + ", \"MaxLat\": " + maxLat + ", \"MinLon\": " + minLon + ", \"MaxLon\": " + maxLon + "}");
+        droneSocket.send("{\"DataType\": [\"fog\"],\"Altitude\": 1700, \"DateTime\": \"19_12\", \"MinLat\": " + minLat + ", \"MaxLat\": " + maxLat + ", \"MinLon\": " + minLon + ", \"MaxLon\": " + maxLon + "}");
     },
 
     componentDidMount: function () {
@@ -563,29 +676,15 @@ var PredictionMap = React.createClass({
         google.maps.event.addListenerOnce(predMap, 'bounds_changed', this.sendMapData);
         predMap.addListener('dragend', this.sendMapData);
 
-
-        // var marker = new google.maps.Marker({
-        //     position: new google.maps.LatLng(this.props.startLat, this.props.startLng),
-        //     map: predMap,
-        //     label: 'START',
-        //     title: 'start'
-        // });
-        // var marker = new google.maps.Marker({
-        //     position: new google.maps.LatLng(this.props.endLat, this.props.endLng),
-        //     map: predMap,
-        //     label: 'END',
-        //     title: 'destination'
-        // });
-
         // Adding route
         var startLabel = new MapLabel({
           text: 'START',
           position: new google.maps.LatLng(this.props.startLat, this.props.startLng),
           map: predMap,
-          fontSize: 15,
+          fontSize: 12,
           align: 'center',
           strokeWeight: 15,
-          strokeColor: '#FF0000'
+          strokeColor: '#06FFBC'
         });
         startLabel.set('position', new google.maps.LatLng(this.props.startLat, this.props.startLng));
         var startMarker = new google.maps.Marker();
@@ -593,15 +692,14 @@ var PredictionMap = React.createClass({
         startMarker.bindTo('position', startLabel);
         startMarker.setDraggable(false);
 
-
         var endLabel = new MapLabel({
           text: 'DESTINATION',
           position: new google.maps.LatLng(this.props.endLat, this.props.endLng),
           map: predMap,
-          fontSize: 15,
+          fontSize: 12,
           align: 'center',
           strokeWeight: 15,
-          strokeColor: '#FF0000'
+          strokeColor: '#06FFBC'
         });
         endLabel.set('position', new google.maps.LatLng(this.props.endLat, this.props.endLng));
         var endMarker = new google.maps.Marker();
@@ -609,9 +707,41 @@ var PredictionMap = React.createClass({
         endMarker.bindTo('position', endLabel);
         endMarker.setDraggable(false);
 
+        // Move
+        var ballIcon = {
+            path: 'M 0, 0 m -10, 0 a 10,10 0 1,0 20,0 a 10,10 0 1,0 -20,0',
+            fillColor: '#34eaff',
+            fillOpacity: 1.0,
+            scale: 1,
+            strokeColor: 'black',
+            strokeWeight: 2
+        };
+
+        var marker = new google.maps.Marker({
+            position: new google.maps.LatLng(this.props.startLat, this.props.startLng),
+            icon: ballIcon,
+            map: predMap
+        });
+
+        this.setState({marker: marker});
+        // Initial Pos
+        // newPos = new google.maps.LatLng(this.props.startLat, this.props.startLng);
+        // // Move / marker
+        // var mapLabel = new MapLabel({
+        //     position: newPos,
+        //     map: predMap,
+        //     icon: goldStar
+        // });
+        // marker = new google.maps.Marker();
+        // marker.bindTo('map', mapLabel);
+
         // Destination Service
         var directtionsService = new google.maps.DirectionsService();
-        var directionsDisplay = new google.maps.DirectionsRenderer();
+        var directionsDisplay = new google.maps.DirectionsRenderer({
+            polylineOptions: {
+                strokeColor: "#34eaff"
+            }
+        });
         directionsDisplay.setMap(predMap);
         var request = {
             origin: new google.maps.LatLng(this.props.startLat, this.props.startLng),
@@ -621,27 +751,21 @@ var PredictionMap = React.createClass({
         directtionsService.route(request, function(result, status) {
             if (status == google.maps.DirectionsStatus.OK) {
                 directionsDisplay.setDirections(result);
-                console.log(result);
+                // console.log(result);
+                var positions = []
+                var steps = result.routes[0].legs[0].steps
+                for (i = 0; i < steps.length; i++) {
+                    positions[i] = steps[i].start_location;
+                    // console.log(steps[i]);
+                    // positions[i] = steps[i];
+                }
+                this.setState({steps: positions});
             } else {
                 console.log('Error with directions: ' + status);
             }
-        });
-        
+        }.bind(this));
 
-        /**
-            Pull steps from result
-                result.routes[0].legs[0].steps
-
-            Make slider based on number of steps
-
-            As slider moves, jump Marker to step
-        */
     },
-
-    // componentWillReceiveProps: function (nextProps) {
-    //     console.log('componentWillReceiveProps: ' + nextProps);
-    //     // this.setState(rhData: )
-    // },
 
     mapCenterLatLng: function () {
         var props = this.props;
@@ -649,8 +773,80 @@ var PredictionMap = React.createClass({
     },
 
     componentDidUpdate: function () {
+        // console.log('pred map update: ' + this.state.steps.length);
         var map = this.state.predMap;
         map.panTo(this.mapCenterLatLng());
+
+        // TODO - hack - fix this
+        var stepIx = 0;
+        switch(this.props.time) {
+            case "1":
+                stepIx = 1;
+                break;
+            case "2":
+                stepIx = 4;
+                break;
+            case "3":
+                stepIx = 6;
+                break;
+            case "4":
+                stepIx = 8;
+                break;
+            case "5":
+                stepIx = 8;
+                break;
+            case "6":
+                stepIx = 9;
+                break;
+            case "7":
+                stepIx = 10;
+                break;
+            case "8":
+                stepIx = 11;
+                break;
+            case "9":
+                stepIx = 12;
+                break;
+            case "10":
+                stepIx = 14;
+                break;
+            case "11":
+                stepIx = 18;
+                break;
+            case "12":
+                stepIx = 21;
+                break;
+            default:
+                stepIx = 0;
+        }
+        // this.state.positions.length / this.state.time
+        if (this.state.steps && this.state.steps.length > 0 && this.props.time) {
+            // console.log("update marker position: " + this.state.steps[this.props.time] + " time: " + this.props.time);
+            this.state.marker.setPosition(this.state.steps[stepIx]);
+        } else {
+            // console.log('No steps');
+        }
+        // TODO Move marker based on location, slider, etc...
+        // this.state.marker.position = map.getCenter();
+
+       // fillColor: '#34eaff',
+
+        // var ballIcon = {
+        //     path: 'M100,100a0,0 0 1,0 0,0a0,0 0 1,0 0,0',
+        //     fillColor: 'black',
+        //     scale: 1
+        // };
+
+        // // Initial Pos
+        // newPos = new google.maps.LatLng(this.props.startLat, this.props.startLng);
+        // // Move / marker
+        // var mapLabel = new MapLabel({
+        //     position: newPos,
+        //     map: map,
+        //     icon: ballIcon
+        // });
+        // marker = new google.maps.Marker();
+        // marker.bindTo('map', mapLabel);
     },
 
     render: function () {
@@ -673,19 +869,32 @@ var PredictionMap = React.createClass({
 var PreditionOverlay = React.createClass({
     
     getInitialState: function () {
+        // var thick = textures.lines().strokeWidth(1).size(5).stroke("#8948E5");
+        // var norm = textures.lines().strokeWidth(1).size(10).stroke("#8948E5");
+        // var thin = textures.lines().strokeWidth(1).size(15).stroke("#8948E5");
+        var fogPatterns = [];
+        fogPatterns[70] = thickFog;
+        fogPatterns[60] = normFog;
+        fogPatterns[53] = thinFog;
         return {
-            fogThreshold: [50, 75, 100],
+            // fogThreshold: [50, 75, 100],
             // fogColors: ["#FFFFFF", "#2ca02c"]
-            fogColors: ["#F3ECFC", "#8948E5"]
+            // fogColors: ["#F3ECFC", "#8948E5"]
             // fogColors: ["#f2f0f7", "#54278f"]
+            fogPatterns: fogPatterns
         };
     },
 
     componentDidMount: function () {
 
         var el = ReactDOM.findDOMNode(this);
-        var map = this.props.predMap; 
-        fogOverlay = new FogOverlay([], el, this.state.fogThreshold, this.state.fogColors);
+        var map = this.props.predMap;
+
+        // var textureArray = [];
+        // textureArray[0] = thick;
+        // textureArray[1] = norm;
+        // textureArray[2] = thin;
+        fogOverlay = new FogOverlay([], el, this.state.fogPatterns);
         // if (map) {
                         // console.log("setting map for fog");
 
@@ -737,23 +946,23 @@ var WeatherInfo = React.createClass({
     getDefaultProps: function() {
         return {
             alert: 'WARNING: HEAVY FOG',
-            temp: 11,
-            humidity: 47.37796,
-            wind: 8.5562592,
-            rainfall: 11,
-            sunshune: 2,
-            pressure: 10
+            temp: '9°C',
+            humidity: '64%',
+            wind: '17.0 KM/H',
+            rainfall: '5.2 MM',
+            sunshune: '10 mins',
+            pressure: '986 HPA'
         };
     },
 
     render: function () {
 
         return (
-            <div id="weatherInfo" className="weatherInfoDiv">
-                <div className="row text-center">
+            <div id="weatherInfo" className="panel panel-default weatherInfoDiv">
+                <div id="warningDiv" className="row text-center panel-heading">
                     <h5>{this.props.alert}</h5>
                 </div>
-                <div className="row">
+                <div className="row panel-body">
                     <div className="span3">
                         <ul>
                             <li>TEMPERATURE: {this.props.temp}</li>

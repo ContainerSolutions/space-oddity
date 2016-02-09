@@ -186,10 +186,10 @@ var Viz = React.createClass({
 	}
 });
 
-ReactDOM.render(
-	<Viz />,
-	document.getElementById('react-hook-2')
-);
+// ReactDOM.render(
+// 	<Viz />,
+// 	document.getElementById('react-hook-2')
+// );
 
 function drawLineChart(elementParent, data) {
 
