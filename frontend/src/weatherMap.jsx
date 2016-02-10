@@ -26,7 +26,7 @@ var MapHeader = React.createClass({
     render: function() {
         return (
             <div className='row text-center mapHeader'>
-                <div className='span2 text-left'>
+                <div className='span2 text-left' id="droneTitle">
                     <h4>DRONE DATA</h4>
                 </div>
                 <div className='span2 text-right'>
@@ -265,7 +265,7 @@ var MapDiv = React.createClass({
     render: function() {
         return (
             <div id='map' className="row">
-                <div className="span6">
+                <div className="span6" id="leftDiv">
                     <div className="row">
                         <MapHeader toggleHumid={this.sendSocketData.bind(this, 'rh')} toggleTemp={this.sendSocketData.bind(this, 'tmp')}/>
                     </div>
@@ -285,7 +285,7 @@ var MapDiv = React.createClass({
                         </div>
                     </div>
                 </div>
-                <div className="span6">
+                <div className="span6" id="rightDiv">
                     <div className='row text-right'>
                         <div className='span4 text-left'>
                             <h4>WEATHER PREDICTION - FOG</h4>
@@ -455,8 +455,8 @@ var WeatherMap = React.createClass({
     render: function () {
         // console.log('WeatherMap Tmp Data: ' + this.props.tmpData);
         var style = {
-            width: '500px',
-            height: '500px',
+            width: '450px',
+            height: '450px',
             margin: '0 auto'
         };
         return (
@@ -852,8 +852,8 @@ var PredictionMap = React.createClass({
     render: function () {
         // console.log('WeatherMap Tmp Data: ' + this.props.tmpData);
         var style = {
-            width: '500px',
-            height: '500px',
+            width: '450px',
+            height: '450px',
             margin: '0 auto'
         };
         return (
