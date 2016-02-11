@@ -99,6 +99,18 @@ body {
 	margin-left: 20px;
 }
 
+#fogSvg {
+	padding-left: 10px;
+}
+
+#tmpSvg {
+	padding-left: 10px;
+}
+
+#rhSvg {
+	padding-left: 10px;
+}
+
 #rhLabel {
 	float: left;
 	padding-right: 50px;
@@ -119,6 +131,23 @@ body {
 
 #droneTitle {
 	margin-left: 20px;
+}
+
+#tmpTitle {
+	padding-top: 10px;
+}
+
+#hmdTitle {
+	padding-top: 10px;
+}
+
+#fogTitle {
+	padding-top: 10px;
+	/*padding-right: 10px;*/
+}
+
+#fogLabel {
+
 }
 
 #warningDiv {

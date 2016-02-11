@@ -29,13 +29,13 @@ var MapHeader = React.createClass({
                 <div className='span2 text-left' id="droneTitle">
                     <h4>DRONE DATA</h4>
                 </div>
-                <div className='span2 text-right'>
+                <div className='span2 text-right' id="tmpTitle">
                     <label id="tempBtnLbl" htmlFor="tempBtn">TEMPERATURE</label>
                     <button id="tempBtn" type="button" onClick={this.props.toggleTemp}>
                         <span className="fa fa-plus" aria-hidden="true"></span>
                     </button>
                 </div>
-                <div className='span2 text-right'>
+                <div className='span2 text-right' id="hmdTitle">
                     <label id="hmdBtnLbl" htmlFor="hmdBtn">HUMIDITY</label>
                     <button id="hmdBtn" type="button" onClick={this.props.toggleHumid}>
                         <span className="fa fa-circle-o" aria-hidden="true"></span>
@@ -146,6 +146,7 @@ var MapDiv = React.createClass({
     },
 
     startSocket: function() {
+
         // Open WebSocket to Data Service
         // droneSocket = new WebSocket("ws://localhost:8081/socket");
         droneSocket = new WebSocket("ws://drone.container-solutions.com/socket");
@@ -156,16 +157,20 @@ var MapDiv = React.createClass({
             // droneSocket.send("initiate web socket...");
 
             // var bounds = this.map.getBounds();
-            var maxLat = 0.0; //bounds.getNorthEast().lat();
-            var maxLon = 0.0; //bounds.getNorthEast().lng();
-            var minLat = 0.0; //bounds.getSouthWest().lat();
-            var minLon = 0.0; //bounds.getSouthWest().lng();
-            droneSocket.send("{DataType: [\"rh\"], Altitude: 1700, DateTime: \"19_12\", MinLat: " + minLat + ", MaxLat: " + maxLat + ", MinLon: " + minLon + ", MaxLon: " + maxLon + "}");
+            var maxLat = 47.482475; //bounds.getNorthEast().lat();
+            var maxLon = 8.710754; //bounds.getNorthEast().lng();
+            var minLat = 47.27324; //bounds.getSouthWest().lat();
+            var minLon = 8.401764; //bounds.getSouthWest().lng();
+            droneSocket.send(JSON.stringify({"dataType": ["rh"], "altitude": 1700, "dateTime":  "19_12", "minLat": minLat, "maxLat": maxLat, "minLon": minLon, "maxLon": maxLon }));
         }
 
         droneSocket.onmessage = function(event) {
             // console.log(JSON.parse(event.data)[0]);
             // console.log("received data: " + event.data.length);
+            if (JSON.parse(event.data) === null) {
+                console.log('Empty message received: ' + event.data);
+                return;
+            }
             if (JSON.parse(event.data)[0].type === "tmp") {
                 // console.log(event.data);
                 // tmpOverlay.setData(event.data);
@@ -189,9 +194,11 @@ var MapDiv = React.createClass({
             }
         }.bind(this);
 
-        droneSocket.onclose = function(event) {
-            console.log('on close received');
-            setTimeout(function(){startSocket()}, 5000);
+        droneSocket.onclose = function() {
+            // console.log(this);
+            console.log('on close received. ' + this);
+            var recurse = this.startSocket
+            setTimeout(recurse, 5000);
         }.bind(this);
     },
 
@@ -290,7 +297,7 @@ var MapDiv = React.createClass({
                         <div className='span4 text-left'>
                             <h4>WEATHER PREDICTION - FOG</h4>
                         </div>
-                        <div className='span2'>
+                        <div className='span2' id="fogTitle">
                             <label id="fogBtnLbl" htmlFor="fogBtn">FOG</label>
                             <button id="fogBtn" type="button" onClick={this.props.toggleTemp}>
                                 <span aria-hidden="true">/</span>
@@ -331,10 +338,10 @@ var PredMapSlider = React.createClass({
         return (
             <div id="sliderDiv" className="span6 sliderDiv">
                 <label className="form-label" htmlFor="sliderTime">12:00</label>
+                <label className="form-label" htmlFor="sliderTime">13:00</label>
+                <label className="form-label" htmlFor="sliderTime">14:00</label>
                 <label className="form-label" htmlFor="sliderTime">15:00</label>
-                <label className="form-label" htmlFor="sliderTime">18:00</label>
-                <label className="form-label" htmlFor="sliderTime">21:00</label>
-                <label className="form-label" htmlFor="sliderTime">00:00</label>
+                <label className="form-label" htmlFor="sliderTime">16:00</label>
                 <input type="range" className="sliderTime" id="sliderTime" min={this.props.minVal} max={this.props.maxVal} step="1" onChange={this.props.onChange} value={this.props.val} list="timeList"/>
                 <datalist id="timeList">
                     <option>1</option>
@@ -386,7 +393,7 @@ var WeatherMap = React.createClass({
         var maxLon = bounds.getNorthEast().lng();
         var minLat = bounds.getSouthWest().lat();
         var minLon = bounds.getSouthWest().lng();
-        droneSocket.send("{\"Altitude\": 1700, \"DateTime\": \"19_12\", \"MinLat\": " + minLat + ", \"MaxLat\": " + maxLat + ", \"MinLon\": " + minLon + ", \"MaxLon\": " + maxLon + "}");
+        droneSocket.send(JSON.stringify({"minLat": minLat, "maxLat": maxLat, "minLon": minLon, "maxLon": maxLon }));
     },
 
     componentDidMount: function () {
@@ -647,7 +654,7 @@ var PredictionMap = React.createClass({
         var maxLon = bounds.getNorthEast().lng();
         var minLat = bounds.getSouthWest().lat();
         var minLon = bounds.getSouthWest().lng();
-        droneSocket.send("{\"DataType\": [\"fog\"],\"Altitude\": 1700, \"DateTime\": \"19_12\", \"MinLat\": " + minLat + ", \"MaxLat\": " + maxLat + ", \"MinLon\": " + minLon + ", \"MaxLon\": " + maxLon + "}");
+        droneSocket.send(JSON.stringify({"dataType": ["fog"], "altitude": 1700, "dateTime":  "19_12", "minLat": minLat, "maxLat": maxLat, "minLon": minLon, "maxLon": maxLon }));
     },
 
     componentDidMount: function () {
@@ -873,9 +880,9 @@ var PreditionOverlay = React.createClass({
         // var norm = textures.lines().strokeWidth(1).size(10).stroke("#8948E5");
         // var thin = textures.lines().strokeWidth(1).size(15).stroke("#8948E5");
         var fogPatterns = [];
-        fogPatterns[70] = thickFog;
-        fogPatterns[60] = normFog;
-        fogPatterns[53] = thinFog;
+        fogPatterns[60] = thickFog;
+        fogPatterns[55] = normFog;
+        fogPatterns[52] = thinFog;
         return {
             // fogThreshold: [50, 75, 100],
             // fogColors: ["#FFFFFF", "#2ca02c"]
