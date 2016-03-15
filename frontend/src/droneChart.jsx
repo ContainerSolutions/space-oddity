@@ -3,7 +3,6 @@ var jQuery = require('jquery');
 var WeatherMap = require('./weatherMap.jsx');
 var d3 = require("d3");
 var nvd3 = require("nvd3");
-// var WeatherChart = require('./WeatherChart.jsx');
 
 var lineChart
 
@@ -68,98 +67,22 @@ var Viz = React.createClass({
 	},
 	loadData: function() {
 		var dataUrl = 'http://localhost:8081/?index=drones*';
+		// Mantl URL
 		// var dataUrl = 'http://drone-data.drone.container-solutions.com/?index=drones*';
 
-		// *************
-		// Drone Data Service
-		// *************
-		// jQuery.ajax({
-			// url: dataUrl,
-			// dataType: "json",
-			// username: "csUser",
-			// password: "testPassword",
-			// beforeSend: function(xhr) {
-			// 	console.log("called??");
-			// 	xhr.setRequestHeader("Authorization", "Basic " + btoa("csUser:testPassword"));
-			// }
-		// }).then(function(data) {
 		jQuery.getJSON(dataUrl).then(function(data) {
 			var droneData = [];
 			for (var i = 0; i < data.length; i++) {
-				droneData[i] = data[i]; //._source;
-				// console.log('here');
-				// var date_time = data[i]._source.date_time.split(" ");
+				droneData[i] = data[i];
 				var date_time = data[i].date_time.split(" ");
-				// console.log('there');
 				droneData[i]['time'] = date_time[1];
 			}
 			// pull out relevant data....
-			// console.log(droneData);
 			this.setState({
 				data: droneData
 			});
 		}.bind(this));
 
-		// *************
-		// Elasticsearch
-		// *************
-		// var client = new elasticsearch.Client();
-		// client.search({
-		// 	index: 'drones-2015.09.29',
-		// 	size: 1000,
-		// 	body: {
-		// 	}
-		// }).then(function (resp) {
-		// 	// console.log(resp.hits.hits);
-		// 	var data = [];
-		// 	for (var i = 0; i < resp.hits.hits.length; i++) {
-		// 		data[i] = resp.hits.hits[i]._source;
-		// 		// console.log('here');
-		// 		var date_time = resp.hits.hits[i]._source.date_time.split(" ");
-		// 		// console.log('there');
-		// 		data[i]['time'] = date_time[1];
-		// 	}
-		// 	// pull out relevant data....
-		// 	console.log(data);
-		// 	this.setState({
-		// 		data: data
-		// 	});
-		// }.bind(this));
-
-		// *************
-		// CSV
-		// *************
-		// d3.csv('data/drone1.csv',function(csv){
-		// 	this.setState({
-		// 		data: csv
-		// 	});
-		// }.bind(this));
-		// var dataUrlCsv = 'http://localhost:8081/?source=csv&file=data/drone2.csv';
-		// jQuery.getJSON(dataUrlCsv).then(function(data) {
-		// 	var droneData = [];
-		// 	for (var i = 0; i < data.length; i++) {
-		// 		droneData[i] = data[i]; //._source;
-		// 		// console.log('here');
-		// 		// var date_time = data[i]._source.date_time.split(" ");
-		// 		var date_time = data[i].date_time.split(" ");
-		// 		// console.log('there');
-		// 		droneData[i]['time'] = date_time[1];
-		// 	}
-		// 	// pull out relevant data....
-		// 	// console.log(droneData);
-		// 	this.setState({
-		// 		data2: droneData
-		// 	});
-		// }.bind(this));
-
-		// d3.text("data/drone2.csv", function(textData) {
-		// 	var csv = d3.csv.parseRows(textData);
-		// // })
-		// // d3.csv('data/drone2.csv',function(csv){
-		// 	this.setState({
-		// 		data2: csv
-		// 	});
-		// }.bind(this));
 	},
 	componentDidMount: function() {
 		this.loadData();
@@ -186,11 +109,6 @@ var Viz = React.createClass({
 	}
 });
 
-// ReactDOM.render(
-// 	<Viz />,
-// 	document.getElementById('react-hook-2')
-// );
-
 function drawLineChart(elementParent, data) {
 
   	nv.addGraph(function() {
@@ -204,7 +122,6 @@ function drawLineChart(elementParent, data) {
       .showLegend(true);
     lineChart.xAxis
       .tickFormat(d3.format('.1f'))
-      // .axisLabel('Altitude (m)')
       .staggerLabels(false);
     lineChart.yAxis
       .tickFormat(d3.format('.1f'));

@@ -72,33 +72,12 @@ function drawLineChart(elementParent, data) {
             .attr('transform', 'translate(' + margin.left + ',' + margin.top + ')');
 
     drawPaths(svg, data, x, y);
-  //   nv.addGraph(function() {
-  //   lineChart = nv.models.lineChart()
-  //     .margin({left: 40, right: 25})
-  //     .x(function(d) {return d.x})
-  //     .y(function(d) {return d.y})
-  //     .useInteractiveGuideline(true)
-  //     .showYAxis(true)
-  //     .showXAxis(true)
-  //     .showLegend(true);
-  //   lineChart.xAxis
-  //     .tickFormat(d3.format('.1f'))
-  //     // .axisLabel('Altitude (m)')
-  //     .staggerLabels(false);
-  //   lineChart.yAxis
-  //     .tickFormat(d3.format('.1f'));
-  //   d3.select('#' + elementParent + ' svg')
-  //     .datum(data)
-  //     .call(lineChart);
-  //   nv.utils.windowResize(function() { lineChart.update() });
-  //   return lineChart;
-  // });
 }
 
 function updateLineChart(elementParent, data) {
-    //  d3.select('#' + elementParent + ' svg')
-    // .datum(data)
-    // .call(lineChart);
+     d3.select('#' + elementParent + ' svg')
+    .datum(data)
+    .call(lineChart);
 }
 
 function formatData(selection, args) {

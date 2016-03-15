@@ -1,13 +1,7 @@
 var google = global.google;
 var d3 = require("d3");
-// var textures = require("textures");
-
 
 var layer = null;
-
-// var thick = textures.lines().thicker().stroke("#8948E5");
-// var norm = textures.lines().stroke("#8948E5");
-// var thin = textures.lines().thinner().stroke("#8948E5");
 
 
 function positionOverlayByDimensions(projectedLatLng) {
@@ -19,49 +13,15 @@ function positionOverlayByDimensions(projectedLatLng) {
 }
 
 function draw() {
-    // console.log("DRAW: " + this);
     var projection = this.getProjection(),
       padding = 10;
 
-    // Textures testing:
-    // var t1 = textures.circles()
-    //     .radius(4)
-    //     .fill("transparent")
-    //     .strokeWidth("2")
-    //     .stroke("firebrick")
-    //     .complement()
-    //     .thinner();
-
-    // var t2 = textures.circles()
-    //     .radius(4)
-    //     .fill("transparent")
-    //     .strokeWidth("2")
-    //     .stroke("firebrick")
-    //     .complement();
-
-    // var t3 = textures.circles()
-    //     .radius(4)
-    //     .fill("transparent")
-    //     .strokeWidth("2")
-    //     .stroke("firebrick")
-    //     .complement()
-    //     .thicker();
-
-    // var colorFunc = this.color;
     var textures = this.textures;
-
-    // var width = 960,
-        // height = 500;
-
-    // var svg = d3.select(this.getPanes().overlayLayer).append("svg")
-    //             .attr("width", width)
-    //             .attr("height", height);
 
     if (!layer) {
         return;
     }
 
-    // console.log('draw: ' + this.data.length);
     if (this.data.length < 1) {
         layer.selectAll("svg").remove();
         return;
@@ -73,54 +33,14 @@ function draw() {
       .each(transform)
       .attr("class", "marker");
 
-    // console.log('Data: ' + this.data);
-
     for (var k in textures) {
         marker.call(textures[k]);
     }
-    // marker.call(textures[0]);
-    // marker.call(textures[1]);
-    // marker.call(textures[2]);
 
     // Add rectangle
     marker.append("svg:rect")
         .attr("width", 15)
         .attr("height", 25);
-        // .attr("x", padding)
-        // .attr("y", padding);
-
-    // var x = d3.scale.linear()
-    //     .domain([0, 4500])
-    //     .range([0, 280]);
-
-    // var xAxis = d3.svg.axis()
-    //   .scale(x)
-    //   .orient("bottom")
-    //   .tickSize(13)
-    //   .tickFormat(d3.format(".0f"));
-
-    // var key = svg.append("g")
-    //     .attr("class", "key")
-    //     .attr("transform", "translate(" + (width - 300) + "," + (height - 30) + ")");
-
-    // key.append("rect")
-    //     .attr("x", -10)
-    //     .attr("y", -10)
-    //     .attr("width", 310)
-    //     .attr("height", 40)
-    //     .style("fill", "white")
-    //     .style("fill-opacity", 0.5)
-
-    // key.selectAll(".band")
-    //   .data(d3.pairs(x.ticks(10)))
-    // .enter().append("rect")
-    //   .attr("class", "band")
-    //   .attr("height", 8)
-    //   .attr("x", function(d) { return x(d[0]); })
-    //   .attr("width", function(d) { return x(d[1]) - x(d[0]); })
-    //   .style("fill", function(d) { return colorFunc(d[0]); });
-
-    // key.call(xAxis);
 
     function transform(d) {
         d = new google.maps.LatLng(d.value.lat, d.value.lon);
@@ -142,63 +62,32 @@ function draw() {
                     return "none";
                 }
                 return t.url();
-                // if (d.value.value > 15) {
-                //     return t1.url();
-                // } else if (d.value.value > 10) {
-                //     return t2.url();
-                // } else {
-                //     return t3.url();
-                // }
-                // return colorFunc(d.value.value);
             });
     }
 }
 
 function onAdd() {
-    // console.log('onAdd');
     var panes = this.getPanes();
-    // console.log(panes);
-    // console.log(this.getMap());
+
     layer = d3.select(panes.overlayLayer).append("div")
         .attr("class", "weather-points");
-    // buildKey();
-    // this.map.addListener('zoom_changed', updateMapData);
-    // this.map.addListener('dragend', updateMapData);
 }
 
 function setData(data) {
-    // console.log('set data: ' + data[0]);
     if (data && data.length > 0) {
         this.data = JSON.parse(data);
     } else {
-        // console.log('no data');
         this.data = data;
     }
     this.draw();
 }
 
-function DataOverlay(data, node, textures) { //} thresholds, colors) {
-    // console.log('created overlay');
-    // console.log(thresholds);
+function DataOverlay(data, node, textures) {
+
     this.el = node;
-    // console.log("Overlay, Node: " + node.innerHTML + " Colors: " + colors);
     this.data = data;
 
     this.textures = textures;
-    // thresholds = thresholds;
-
-    // var interpolateColor = d3.interpolateHcl("#55075A", "#F7DBCA");
-    // var interpolateColor = d3.interpolateHcl(colors[0], colors[1]);
-    
-    // var threshold = d3.scale.threshold()
-    // .domain(thresholds)
-    // .range(d3.range(thresholds.length + 1));
-
-    // this.color = d3.scale.threshold()
-    //     .domain(thresholds)
-    //     .range(d3.range(thresholds.length + 1).map(function(d, i) { return interpolateColor(i / thresholds.length); }));
-
-    // this.el.style.position = 'absolute';
 }
 
 DataOverlay.prototype = Object.create(google.maps.OverlayView.prototype);

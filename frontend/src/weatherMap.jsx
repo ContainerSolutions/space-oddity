@@ -15,10 +15,7 @@ var thinTmp = textures.lines().orientation("3/8", "7/8").strokeWidth(1).stroke("
 var thickFog = textures.lines().strokeWidth(1).size(5).stroke("#8948E5");
 var normFog = textures.lines().strokeWidth(1).size(10).stroke("#8948E5");
 var thinFog = textures.lines().strokeWidth(1).size(15).stroke("#8948E5");
-// var Slider = require('react-rangeslider');
-// var Volume = require('./test.jsx');
 
-// var map = null;
 var droneSocket = null;
 
 var MapHeader = React.createClass({
@@ -49,9 +46,6 @@ var MapHeader = React.createClass({
 var MapDiv = React.createClass({
 
     getInitialState: function() {
-        // var thickRh = textures.circles().radius(2).fill("transparent").strokeWidth(1).stroke("#FF9510").size(5);
-        // var normRh = textures.circles().radius(2).fill("transparent").strokeWidth(1).stroke("#FF9510").size(8);
-        // var thinRh = textures.circles().radius(2).fill("transparent").strokeWidth(1).stroke("#FF9510").size(11);
         var textureArrayRh = {};
         textureArrayRh[80] = thickRh;
         textureArrayRh[60] = normRh;
@@ -76,20 +70,14 @@ var MapDiv = React.createClass({
         return {
             tmp: false,
             rh: true,
-            // tmpThreshold: [-5, 0, 5, 10, 15, 20, 25],
             tmpThreshold:[0, 10, 20],
             rhThreshold: [0, 25, 50, 75, 100],
             fogThreshold: [50, 75, 100],
-            // fogColors: ["#D3F9CB", "#2ca02c"],
-            // fogColors: ["#FFFFFF", "#2ca02c"],
-            // fogColors: ["#F3ECFC", "#8948E5"],
+
             fogPatterns: fogPatterns,
             tmpPatterns: textureArrayTmp,
             rhPatterns: textureArrayRh,
-            // tmpColors: ["#F7DBCA", "#55075A"],
-            // tmpColors: ["#FFE5EA", "#FF0031"],
-            // rhColors: ["#f2f0f7", "#54278f"],
-            // rhColors: ["#FFF4E7", "#FF9510"],
+
             tmpData: [],
             rhData: [],
             fogData: []
@@ -107,15 +95,12 @@ var MapDiv = React.createClass({
             stop = !this.state.tmp;
         }
         var dataTypeString = (this.state.tmp ? "tmp" : "") + (this.state.rh ? "rh" : "");
-        console.log("Sending socket data: " + dataTypeString + " stop? " + stop);
         droneSocket.send(JSON.stringify({"dataType": [dataType], "stop": stop}));
         if (stop) {
             var that = this;
             if (dataType == "tmp") {
                 setTimeout(function(){that.setState({tmpData: []})}, 1000);
-                // setTimeout(this.setState({tmpData: []}), ;
             } else if (dataType == "rh") {
-                // this.setState({rhData: []});
                 setTimeout(function(){that.setState({rhData: []})}, 1000);
             }
         }
@@ -153,9 +138,6 @@ var MapDiv = React.createClass({
         // droneSocket = new WebSocket("ws://drone.container-solutions.com/socket");
 
         droneSocket.onopen = function (event) {
-            console.log('sending data...');
-
-            // droneSocket.send("initiate web socket...");
 
             // var bounds = this.map.getBounds();
             var maxLat = 47.482475; //bounds.getNorthEast().lat();
@@ -166,28 +148,14 @@ var MapDiv = React.createClass({
         }
 
         droneSocket.onmessage = function(event) {
-            // console.log(JSON.parse(event.data)[0]);
-            // console.log("received data: " + event.data.length);
             if (JSON.parse(event.data) === null) {
                 console.log('Empty message received: ' + event.data);
                 return;
             }
-            if (JSON.parse(event.data)[0].type === "tmp") {
-                // console.log(event.data);
-                // tmpOverlay.setData(event.data);
-                // this.state.tmpData = event.data;
-                // this.props.tmpData = event.data;
-                // this.setProps({tmpData: event.data});
-                // console.log('this.props.tmpData ' + this.props.tmpData);
-                
+            if (JSON.parse(event.data)[0].type === "tmp") {                
                 this.setState({tmpData: event.data});
-
-                // this.refs.wMap.props.tmpData = event.data;
             } else if (JSON.parse(event.data)[0].type === "rh") {
-                // rhOverlay.setData(event.data);
                 this.setState({rhData: event.data});
-                // this.props.rhData = event.data;
-                // this.refs.wMap.props.rhData = event.data;
             } else if (JSON.parse(event.data)[0].type === "fog") {
                 this.setState({fogData: event.data});
             } else {
@@ -196,8 +164,6 @@ var MapDiv = React.createClass({
         }.bind(this);
 
         droneSocket.onclose = function() {
-            // console.log(this);
-            console.log('on close received. ' + this);
             var recurse = this.startSocket
             setTimeout(recurse, 5000);
         }.bind(this);
@@ -211,22 +177,16 @@ var MapDiv = React.createClass({
           .tickSize(13)
           .tickFormat(d3.format(".0f"));
 
-        var svg = el; //d3.select('#map svg');
+        var svg = el;
         var key = svg.append("g")
           .attr("class", "key");
-          // .attr("transform", "translate(" + (width - 300) + "," + (height - 30) + ")");
 
         key.append("rect")
           .attr("x", -10)
           .attr("y", -10)
           .attr("width", 100)
           .attr("height", 40)
-          // .style("fill", "white")
           .style("fill-opacity", 0.0);
-
-        // console.log('x: ' + x);
-        console.log('ticks: ' + x.ticks(4));
-        console.log('pairs: ' + d3.pairs(x.ticks(4)));
 
         for (var k in patterns) {
             key.call(patterns[k]);
@@ -238,35 +198,27 @@ var MapDiv = React.createClass({
         .enter().append("rect")
           .attr("class", "band")
           .attr("height", 13)
-          .attr("x", function(d) { //console.log('x: ' + d[0]); 
+          .attr("x", function(d) {
             return x(d[0]); })
-          .attr("width", function(d) { //console.log('width: ' + d[1]); 
+          .attr("width", function(d) {
             return x(d[1]) - x(d[0]); })
-          .style("fill", function(d) { //console.log('fill: ' + d[0]); 
-            console.log('Val: ' + d[0]);
-            // var temp = count;
-            // count = count + 1;
+          .style("fill", function(d) {
             var p = patterns[d[0]];
             if (!p) {
                 return "none";
             } else {
-                // console.log('p: ' + p);
-                // console.log('p.url: ' + p.url());
                 return p.url();
             }
-            // return patterns[d[0]].url(); 
         });
 
         key.call(xAxis);
     },
 
     sliderChange: function(e) {
-        // console.log('Slider Parent changed: ' + e.target.value);
         this.setState({time: e.target.value});
         // TODO convert slider val to Date Time
         var hour = parseInt(e.target.value) + 11;
         var dateTime = "19_" + hour;
-        // console.log('date_time: ' + dateTime);
         droneSocket.send(JSON.stringify({"dataType": ["fog"], "altitude": 1700, "dateTime":  dateTime }));
     },
 
@@ -378,15 +330,11 @@ var WeatherMap = React.createClass({
             initialZoom: 11,
             mapCenterLat: 47.37796,
             mapCenterLng: 8.5562592,
-            // mapCenterLat: 46.8765891,
-            // mapCenterLng: 8.0826194
         };
     },
 
     sendMapData: function() {
-        console.log('sendMapData');
         if (this.state.map === null) {
-            console.log('map is null');
             return;
         }
         var bounds = this.state.map.getBounds();
@@ -398,7 +346,6 @@ var WeatherMap = React.createClass({
     },
 
     componentDidMount: function () {
-        // console.log('WeatherMap Mounted: ' + JSON.stringify(this.props) + " State: " + JSON.stringify(this.state));
         var styles = [
           {
             "stylers": [
@@ -418,37 +365,11 @@ var WeatherMap = React.createClass({
             styles: styles
         },
         map = new google.maps.Map(mapContainer, mapOptions);
-        console.log('Map created: ' + map);
-        // map.addListener('zoom_changed', updateMapData);
-        // map.addListener('dragend', updateMapData);
-        // console.log(map);
-        // console.log(map.getBounds());
-        // var update = this.sendMapData;
 
-
-        // google.maps.event.addListenerOnce(map, 'bounds_changed', function(update) {
-        //     console.log('once');
-        //     console.log(update);
-        //     update();
-        // });
-        // map.addListener('dragend', function() {
-        //     console.log('updateMapData');
-        //     // sendMapData();
-        //     // update();
-        // });
         this.setState({map: map});
         google.maps.event.addListenerOnce(map, 'bounds_changed', this.sendMapData);
         map.addListener('dragend', this.sendMapData);
-
-        // this.map.addListener('bounds_changed', function() {
-        //     console.log('bounds_changed');
-        // });
     },
-
-    // componentWillReceiveProps: function (nextProps) {
-    //     console.log('componentWillReceiveProps: ' + nextProps);
-    //     // this.setState(rhData: )
-    // },
 
     mapCenterLatLng: function () {
         var props = this.props;
@@ -461,7 +382,6 @@ var WeatherMap = React.createClass({
     },
 
     render: function () {
-        // console.log('WeatherMap Tmp Data: ' + this.props.tmpData);
         var style = {
             width: '450px',
             height: '450px',
@@ -479,62 +399,23 @@ var WeatherOverlay = React.createClass({
     
     getInitialState: function () {
         return {
-            // tmpThreshold: [-5, 0, 5, 10, 15, 20, 25],
             tmpThreshold:[0, 10, 20],
             rhThreshold: [0, 25, 50, 75, 100],
-            // tmpColors: ["#F7DBCA", "#55075A"],
             tmpColors: ["#FFE5EA", "#FF0031"],
-            // rhColors: ["#f2f0f7", "#54278f"]
             rhColors: ["#FFF4E7", "#FF9510"],
-            // rhData: [],
-            // tmpData: []
-            // map: null
         };
     },
 
     componentDidMount: function () {
-        // console.log('WeatherOverlay Mounted: ' + JSON.stringify(this.props) + " State: " + JSON.stringify(this.state));
 
         var el = ReactDOM.findDOMNode(this);
-        // var point = new google.maps.LatLng(45.4665891,8.0826194);
-        // Map not ready yet...
         var map = this.props.map;
-        // console.log(map);
-
-        // droneSocket = new WebSocket("ws://localhost:8081/socket");
-        // droneSocket.onopen = function (event) {
-        //     console.log('sending data...');
-
-        //     // droneSocket.send("initiate web socket...");
-
-        //     // var bounds = this.map.getBounds();
-        //     var maxLat = 0.0; //bounds.getNorthEast().lat();
-        //     var maxLon = 0.0; //bounds.getNorthEast().lng();
-        //     var minLat = 0.0; //bounds.getSouthWest().lat();
-        //     var minLon = 0.0; //bounds.getSouthWest().lng();
-        //     droneSocket.send("{DataType: \"tmp\", Altitude: 110, DateTime: \"19_12\", MinLat: " + minLat + ", MaxLat: " + maxLat + ", MinLon: " + minLon + ", MaxLon: " + maxLon + "}");
-        // }
-        // droneSocket.onmessage = function(event) {
-        //     // console.log(JSON.parse(event.data)[0]);
-        //     if (JSON.parse(event.data)[0].type === "tmp") {
-        //         // console.log('set data tmp');
-        //         tmpOverlay.setData(event.data);
-        //     } else {
-        //         // console.log('set data rh');
-        //         rhOverlay.setData(event.data);
-        //     }
-        // }   
-        // var thickRh = textures.circles().radius(2).fill("transparent").strokeWidth(1).stroke("#FF9510").size(5);
-        // var normRh = textures.circles().radius(2).fill("transparent").strokeWidth(1).stroke("#FF9510").size(8);
-        // var thinRh = textures.circles().radius(2).fill("transparent").strokeWidth(1).stroke("#FF9510").size(11);
+        
         var textureArrayRh = {};
         textureArrayRh[70] = thickRh;
         textureArrayRh[60] = normRh;
         textureArrayRh[55] = thinRh;
 
-        // var thickTmp = textures.lines().orientation("3/8", "7/8").strokeWidth(1).stroke("#FF0031").size(8);
-        // var normTmp = textures.lines().orientation("3/8", "7/8").strokeWidth(1).stroke("#FF0031").size(15);
-        // var thinTmp = textures.lines().orientation("3/8", "7/8").strokeWidth(1).stroke("#FF0031").size(20);
         var textureArrayTmp = {};
         textureArrayTmp[11] = thickTmp;
         textureArrayTmp[10] = normTmp;
@@ -543,66 +424,34 @@ var WeatherOverlay = React.createClass({
         tmpOverlay = new TmpOverlay([], el, textureArrayTmp);
         rhOverlay = new DataOverlay([], el, textureArrayRh); 
         if (map) {
-            console.log("setting map for tmp and rh");
             tmpOverlay.setMap(map);
-            // rhOverlay.setMap(map);
         }
     },
 
     componentDidUpdate: function () {
-        // console.log('update map');
 
-        // console.log(tmpOverlay.getMap());
         if (tmpOverlay.getMap() == null) {
-            console.log("setting map for tmp");
             tmpOverlay.setMap(this.props.map);
         }
         if (rhOverlay.getMap() == null) {
-            console.log("setting map for rh");
             rhOverlay.setMap(this.props.map);
         }
 
-        // if (this.props.tmpData && this.props.tmpData.length > 0) {
-            tmpOverlay.setData(this.props.tmpData);
-        // }
-        // if (this.props.rhData && this.props.rhData.length > 0) {
-            // console.log("setting RH data");
-            rhOverlay.setData(this.props.rhData);
-        // }
+        tmpOverlay.setData(this.props.tmpData);
+        rhOverlay.setData(this.props.rhData);
 
-        // console.log(this.props.tmpData);
-
-        if (this.props.map) {
-            // var bounds = this.props.map.getBounds();
-            // var maxLat = bounds.getNorthEast().lat();
-            // var maxLon = bounds.getNorthEast().lng();
-            // var minLat = bounds.getSouthWest().lat();
-            // var minLon = bounds.getSouthWest().lng();
-            // droneSocket.send("{DataType: \"tmp\", Altitude: 110, DateTime: \"19_12\", MinLat: " + minLat + ", MaxLat: " + maxLat + ", MinLon: " + minLon + ", MaxLon: " + maxLon + "}");
-        }
     },
 
     componentWillReceiveProps: function (nextProps) {
-        // console.log('OVERLAY - componentWillReceiveProps');
-        // console.log(nextProps);
         if (tmpOverlay.getMap() == null) {
-                        console.log("setting map for tmp: " + nextProps.map);
             tmpOverlay.setMap(nextProps.map);
         }
         if (rhOverlay.getMap() == null) {
-                        console.log("setting map for rh");
-
             rhOverlay.setMap(nextProps.map);
         }
-
-        // tmpOverlay.setData(nextProps.tmpData);
-        // rhOverlay.setData(nextProps.rhData);
-        // rhOverlay.draw();
-        // tmpOverlay.draw();
     },
 
     render: function () {
-        // console.log('Overlay state: ' + this.state);
         var overlayStyle = {
             backgroundColor: '#FFF',
             border: '1px solid #000',
@@ -640,14 +489,11 @@ var PredictionMap = React.createClass({
             startLng: 8.47,
             endLat: 47.45,
             endLng: 8.65
-            // mapCenterLat: 46.8765891,
-            // mapCenterLng: 8.0826194
         };
     },
 
     sendMapData: function() {
         if (this.state.map === null) {
-            console.log('map is null');
             return;
         }
         var bounds = this.state.predMap.getBounds();
@@ -732,16 +578,6 @@ var PredictionMap = React.createClass({
         });
 
         this.setState({marker: marker});
-        // Initial Pos
-        // newPos = new google.maps.LatLng(this.props.startLat, this.props.startLng);
-        // // Move / marker
-        // var mapLabel = new MapLabel({
-        //     position: newPos,
-        //     map: predMap,
-        //     icon: goldStar
-        // });
-        // marker = new google.maps.Marker();
-        // marker.bindTo('map', mapLabel);
 
         // Destination Service
         var directtionsService = new google.maps.DirectionsService();
@@ -759,13 +595,10 @@ var PredictionMap = React.createClass({
         directtionsService.route(request, function(result, status) {
             if (status == google.maps.DirectionsStatus.OK) {
                 directionsDisplay.setDirections(result);
-                // console.log(result);
                 var positions = []
                 var steps = result.routes[0].legs[0].steps
                 for (i = 0; i < steps.length; i++) {
                     positions[i] = steps[i].start_location;
-                    // console.log(steps[i]);
-                    // positions[i] = steps[i];
                 }
                 this.setState({steps: positions});
             } else {
@@ -781,7 +614,6 @@ var PredictionMap = React.createClass({
     },
 
     componentDidUpdate: function () {
-        // console.log('pred map update: ' + this.state.steps.length);
         var map = this.state.predMap;
         map.panTo(this.mapCenterLatLng());
 
@@ -827,38 +659,13 @@ var PredictionMap = React.createClass({
             default:
                 stepIx = 0;
         }
-        // this.state.positions.length / this.state.time
         if (this.state.steps && this.state.steps.length > 0 && this.props.time) {
-            // console.log("update marker position: " + this.state.steps[this.props.time] + " time: " + this.props.time);
             this.state.marker.setPosition(this.state.steps[stepIx]);
-        } else {
-            // console.log('No steps');
         }
-        // TODO Move marker based on location, slider, etc...
-        // this.state.marker.position = map.getCenter();
 
-       // fillColor: '#34eaff',
-
-        // var ballIcon = {
-        //     path: 'M100,100a0,0 0 1,0 0,0a0,0 0 1,0 0,0',
-        //     fillColor: 'black',
-        //     scale: 1
-        // };
-
-        // // Initial Pos
-        // newPos = new google.maps.LatLng(this.props.startLat, this.props.startLng);
-        // // Move / marker
-        // var mapLabel = new MapLabel({
-        //     position: newPos,
-        //     map: map,
-        //     icon: ballIcon
-        // });
-        // marker = new google.maps.Marker();
-        // marker.bindTo('map', mapLabel);
     },
 
     render: function () {
-        // console.log('WeatherMap Tmp Data: ' + this.props.tmpData);
         var style = {
             width: '450px',
             height: '450px',
@@ -877,18 +684,11 @@ var PredictionMap = React.createClass({
 var PreditionOverlay = React.createClass({
     
     getInitialState: function () {
-        // var thick = textures.lines().strokeWidth(1).size(5).stroke("#8948E5");
-        // var norm = textures.lines().strokeWidth(1).size(10).stroke("#8948E5");
-        // var thin = textures.lines().strokeWidth(1).size(15).stroke("#8948E5");
         var fogPatterns = [];
         fogPatterns[60] = thickFog;
         fogPatterns[55] = normFog;
         fogPatterns[52] = thinFog;
         return {
-            // fogThreshold: [50, 75, 100],
-            // fogColors: ["#FFFFFF", "#2ca02c"]
-            // fogColors: ["#F3ECFC", "#8948E5"]
-            // fogColors: ["#f2f0f7", "#54278f"]
             fogPatterns: fogPatterns
         };
     },
@@ -898,41 +698,24 @@ var PreditionOverlay = React.createClass({
         var el = ReactDOM.findDOMNode(this);
         var map = this.props.predMap;
 
-        // var textureArray = [];
-        // textureArray[0] = thick;
-        // textureArray[1] = norm;
-        // textureArray[2] = thin;
         fogOverlay = new FogOverlay([], el, this.state.fogPatterns);
-        // if (map) {
-                        // console.log("setting map for fog");
 
-            // fogOverlay.setMap(map);
-        // }
     },
 
     componentDidUpdate: function () {
-        // if (fogOverlay.getMap() == null) {
-            // console.log('Pred Map: ' + this.props.predMap);
-            // fogOverlay.setMap(this.props.predMap);
-                        // console.log("setting map for fog");
-
-        // }
         if (this.props.fogData.length > 0) {
-            // console.log('SETTING FOG DATA');
             fogOverlay.setData(this.props.fogData);
         }
     },
 
     componentWillReceiveProps: function (nextProps) {
         if (fogOverlay.getMap() == null) {
-            console.log("setting map for fog: " + nextProps.predMap);
             fogOverlay.setMap(nextProps.predMap);
         }
         fogOverlay.draw();
     },
 
     render: function () {
-        // console.log('Overlay state: ' + this.state);
         var overlayStyle = {
             backgroundColor: '#FFF',
             border: '1px solid #000',
