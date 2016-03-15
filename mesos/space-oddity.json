@@ -1,0 +1,20 @@
+{                                                                              
+  "id": "space-oddity",                                                        
+  "cpus": 0.2,                                                                 
+  "mem": 300.0,                                                                
+  "instances": 1,                                                              
+  "container": {                                                               
+    "type": "DOCKER",                                                          
+    "docker": {                                                                
+      "image": "containersol/space-oddity",                                    
+      "forcePullImage": true,                                                  
+      "network": "BRIDGE",
+      "portMappings": [
+        { "containerPort": 8080, "hostPort": 0, "protocol": "tcp" }
+      ]
+    }                                                                          
+  },                                                                           
+  "uris": [                                                                    
+    "file:///var/tmp/docker.tar.gz"                                            
+  ]                                                                            
+}

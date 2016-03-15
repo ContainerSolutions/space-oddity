@@ -1,0 +1,14 @@
+---
+- hosts: mi-control-01
+  tasks:
+
+  - name: Launch Kibana via Marathon
+    uri: 
+      url: "https://mi-control-01:8080/v2/apps"
+      method: POST
+      body: "{\"id\": \"kibana\",\"container\": {\"docker\": {\"image\": \"kibana:4.1\",\"network\": \"HOST\",\"parameters\": [{ \"key\": \"env\",\"value\": \"ELASTICSEARCH_URL=http://elasticsearch-executor.service.consul:4000\" }]}},\"cpus\": 0.2,\"mem\": 300.0,\"instances\": 1}"
+      HEADER_Content-Type: "application/json"
+      user: {{user}}
+      password: {{password}}
+      validate_certs: no
+      status_code: 200,201,204

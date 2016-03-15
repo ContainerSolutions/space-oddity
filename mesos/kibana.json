@@ -1,0 +1,17 @@
+{
+    "id": "kibana",
+    "container": {
+        "docker": {
+            "image": "kibana:4.1",
+            "network": "HOST",
+            "parameters": [
+                { "key": "env", 
+                  "value": "ELASTICSEARCH_URL=http://elasticsearch-executor.service.consul:4000" }
+            ]
+                
+        }
+    },
+    "cpus": 0.2,
+    "mem": 300.0,
+    "instances": 1
+}
