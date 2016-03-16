@@ -64,7 +64,6 @@ function draw() {
 }
 
 function onAdd() {
-    console.log('onAdd');
     var panes = this.getPanes();
 
     layer = d3.select(panes.overlayLayer).append("div")
@@ -75,7 +74,6 @@ function setData(data) {
     if (data && data.length > 0) {
         this.data = JSON.parse(data);
     } else {
-        // console.log('no data');
         this.data = data;
     }
     this.draw();

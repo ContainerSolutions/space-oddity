@@ -65,7 +65,6 @@ function draw() {
 }
 
 function onAdd() {
-    console.log('onAdd');
     var panes = this.getPanes();
     layer = d3.select(panes.overlayLayer).append("div")
         .attr("class", "weather-points");

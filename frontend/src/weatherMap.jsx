@@ -514,7 +514,7 @@ var PredictionMap = React.createClass({
             ]
           }
         ];
-        console.log("predMapContainer" + predMapContainer);
+
         var mapOptions = {
             center: this.mapCenterLatLng(),
             mapTypeId: google.maps.MapTypeId.ROADMAP,

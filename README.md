@@ -1,2 +1,2 @@
 # space-oddity
-Drone project
+UI for our Weather Drone Application

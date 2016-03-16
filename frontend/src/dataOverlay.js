@@ -50,10 +50,8 @@ function draw() {
             .style("top", (d.y - padding) + "px")
             .style("opacity", 0.6)
             .style("fill", function(d) {
-                // return textures[0].url();
                 var t = null;
                 for (var k in textures) {
-                    // console.log('...');
                     if (d.value.value > k) {
                         t = textures[k];
                     }
