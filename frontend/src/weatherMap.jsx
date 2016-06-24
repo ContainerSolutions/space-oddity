@@ -18,6 +18,47 @@ var thinFog = textures.lines().strokeWidth(1).size(15).stroke("#8948E5");
 
 var droneSocket = null;
 
+var AltitudeSlider = React.createClass({
+    getDefaultProps: function () {
+        return {
+            minVal: '100',
+            maxVal: '2000',
+            val: '100',
+            sliderLabel: "100 - 500 - 1000 - 1500 - 2000"
+        };
+    },
+    render: function() {
+        return (
+            <div id="altitudeSliderDiv" className="span6 altitudeSliderDiv">
+                <div className="row">
+                    <h4>Altitude Control</h4>
+                </div>
+                <div className="row">
+                    <label className="form-label" htmlFor="sliderAltitude">100m</label>
+                    <label className="form-label" htmlFor="sliderAltitude">500m</label>
+                    <label className="form-label" htmlFor="sliderAltitude">1000m</label>
+                    <label className="form-label" htmlFor="sliderAltitude">1500m</label>
+                    <label className="form-label" htmlFor="sliderAltitude">2000m</label>
+                    <input type="range" className="sliderAltitude" id="sliderAltitude" min={this.props.minVal} max={this.props.maxVal} step="100" onChange={this.props.onChange} value={this.props.val} list="altitudeList"/>
+                    <datalist id="altitudeList">
+                        <option>100</option>
+                        <option>200</option>
+                        <option>400</option>
+                        <option>600</option>
+                        <option>800</option>
+                        <option>1000</option>
+                        <option>1200</option>
+                        <option>1400</option>
+                        <option>1600</option>
+                        <option>1800</option>
+                        <option>2000</option>
+                    </datalist>
+                </div>
+            </div>
+        );
+    }
+});
+
 var MapHeader = React.createClass({
 
     render: function() {
@@ -107,7 +148,6 @@ var MapDiv = React.createClass({
     },
 
     componentDidMount: function() {
-
         this.startSocket();
 
         // Build Legends
@@ -133,18 +173,20 @@ var MapDiv = React.createClass({
     startSocket: function() {
 
         // Open WebSocket to Data Service
-        droneSocket = new WebSocket("ws://192.168.99.102:8081/socket");
-        // droneSocket = new WebSocket("ws://localhost:8081/socket");
+        droneSocket = new WebSocket("ws://192.168.99.100:8081/socket");
+        //droneSocket = new WebSocket("ws://localhost:8081/socket");
         // droneSocket = new WebSocket("ws://drone.container-solutions.com/socket");
 
         droneSocket.onopen = function (event) {
-
+            console.log('Socket connected');
             // var bounds = this.map.getBounds();
             var maxLat = 47.482475; //bounds.getNorthEast().lat();
             var maxLon = 8.710754; //bounds.getNorthEast().lng();
             var minLat = 47.27324; //bounds.getSouthWest().lat();
             var minLon = 8.401764; //bounds.getSouthWest().lng();
-            droneSocket.send(JSON.stringify({"dataType": ["rh"], "altitude": 1700, "dateTime":  "19_12", "minLat": minLat, "maxLat": maxLat, "minLon": minLon, "maxLon": maxLon }));
+            var altitude = 100;
+
+            droneSocket.send(JSON.stringify({"dataType": ["rh"], "altitude": altitude, "dateTime":  "19_12", "minLat": minLat, "maxLat": maxLat, "minLon": minLon, "maxLon": maxLon }));
         }
 
         droneSocket.onmessage = function(event) {
@@ -164,11 +206,11 @@ var MapDiv = React.createClass({
         }.bind(this);
 
         droneSocket.onclose = function() {
-            var recurse = this.startSocket
+            console.log('Can\'t open socket, retrying in 5 seconds');
+            var recurse = this.startSocket;
             setTimeout(recurse, 5000);
         }.bind(this);
     },
-
 
     buildLegend: function(patterns, el, x) {
         var xAxis = d3.svg.axis()
@@ -219,7 +261,13 @@ var MapDiv = React.createClass({
         // TODO convert slider val to Date Time
         var hour = parseInt(e.target.value) + 11;
         var dateTime = "19_" + hour;
-        droneSocket.send(JSON.stringify({"dataType": ["fog"], "altitude": 1700, "dateTime":  dateTime }));
+        var altitude = this.state.altitude;
+        console.log('sending altitude:' + altitude);
+        droneSocket.send(JSON.stringify({"dataType": ["fog"], "altitude": altitude, "dateTime":  dateTime }));
+    },
+
+    altitudeChange: function(e) {
+        this.setState({altitude: e.target.value});
     },
 
     render: function() {
@@ -260,6 +308,7 @@ var MapDiv = React.createClass({
                     <div className='row'>
                         <PredictionMap fogData={this.state.fogData} time={this.state.time}/>
                     </div>
+                    <AltitudeSlider onChange={this.altitudeChange} val={this.state.altitude}/>
                     <PredMapSlider onChange={this.sliderChange} val={this.state.time}/>
                     <div id='fogLegend' className="legend">
                        <label id="fogLabel" htmlFor="fogSvg">FOG</label>
