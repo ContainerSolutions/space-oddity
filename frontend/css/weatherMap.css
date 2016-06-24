@@ -27,17 +27,23 @@ body {
 	height: 50px;
 }
 
-.sliderDiv {
+.sliderDiv,
+.altitudeSliderDiv {
 	padding-bottom: 20px;
 	padding-top: 20px;
 }
 
-.sliderDiv .sliderTime {
+.sliderDiv .sliderTime,
+.altitudeSliderDiv .sliderAltitude {
 	width: 420px;
 }
 
 .weatherInfoDiv {
 	font-size: 12px;
+}
+
+#weatherInfo {
+	margin-top: 220px;
 }
 
 .mapHeader label {
