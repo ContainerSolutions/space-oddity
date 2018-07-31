@@ -9,6 +9,8 @@ const PORT = 8080;
 // App
 var app = express();
 
+var expressWs = require('express-ws')(app);
+
 var auth = function (req, res, next) {
   function unauthorized(res) {
     res.set('WWW-Authenticate', 'Basic realm=Authorization Required');
@@ -32,9 +34,16 @@ app.get('/', auth, function (req, res) {
   res.sendFile(__dirname + '/index.html');
 });
 
+app.ws('/socket', function(ws, req) {
+	  ws.on('message', function(msg) {
+	    console.log(msg);
+      });
+});
+
  app.get(/^(.+)$/, function(req, res){ 
      res.sendfile( __dirname + req.params[0]); 
  });
+
 
 app.use(express.static(__dirname + '/src/lib'));
 app.use(express.static(__dirname + '/css'));
